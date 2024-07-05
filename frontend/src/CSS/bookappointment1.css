@@ -1,0 +1,176 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+.navbar {
+  background: linear-gradient(45deg, #ffefd4, #f5918b);
+  padding: 1rem 0;
+  box-shadow: 0 8px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between !important; /* This will separate the logo and the nav elements */
+  align-items: center !important;
+}
+.navbar .navbar-brand {
+  font-size: 2.5rem;
+  color: rgb(255, 44, 121);
+  font-family: "Dancing Script", cursive;
+  font-weight: 700;
+}
+.navbar .navbar-brand:hover {
+  color: hsl(277, 100%, 50%);
+}
+.navbar .navbar-brand:active {
+  color: #814c74;
+  font-size: 2.52rem;
+}
+.navbar .nav-link {
+  font-size: 1.2rem;
+  color: black;
+  margin-right: 10px;
+  margin-left: 10px;
+  text-transform: uppercase;
+  font-family: "Lora", serif;
+  font-weight: 500l;
+}
+.navbar .nav-link:hover {
+  color: hsl(277, 100%, 50%);
+  transform: scale(1.1);
+}
+.navbar .nav-link:active {
+  color: rgb(255, 0, 191);
+  transform: translate(2px, 2px);
+}
+.navbar .btn {
+  font-size: 20px;
+  color: black;
+  height: 40px;
+  width: 100px;
+  border-radius: 5px;
+  text-transform: uppercase;
+  outline: none;
+  border: none;
+  border: 1px solid rgb(255, 0, 195);
+  box-shadow: 0 2px 4px rgba(100, 100, 100, 0.1), 0 0 4px rgb(0, 0, 0);
+  font-family: "Dancing Script", cursive;
+}
+.navbar .btn:hover {
+  background-color: hsl(277, 100%, 50%);
+  color: white;
+  transform: scale(1.1);
+}
+.container2 {
+  margin-top: 20px;
+  display: flex;
+  width: 100%;
+}
+.search-box {
+  width: 30%;
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-sizing: border-box;
+}
+
+.results {
+  width: 70%;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #9a00b9;
+  color: #fff;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+button:hover {
+  background-color: #5d0070;
+}
+button:active {
+  background-color: #5d0070;
+  transform: translateY(2px);
+}
+.results .card {
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start; /* Align contents to the left */
+  flex-direction: row; /* Add this line */
+  width: 700px; /* Adjust the width as needed */
+  height: 200px; /* Adjust the height as needed */
+}
+.card img {
+  margin-right: 20px;
+  border-radius: 50%;
+  width: 80px; /* Adjust the image width */
+  height: 80px; /* Adjust the image height */
+}
+
+.card .info {
+  max-width: calc(100% - 120px);
+}
+
+.card .info h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #ff009d;
+}
+
+.card .info p {
+  margin: 5px 0;
+}
+
+.card .info button {
+  margin-right: 10px;
+  background-color: #9a00b9;
+  border: none;
+  color: #fff;
+  padding: 10px;
+  cursor: pointer;
+}
+.card .info button:hover {
+  background-color: #5d0070;
+}
+.card .info button:active {
+  background-color: #5d0070;
+  transform: translateY(2px);
+}
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+      flex-direction: column;
+  }
+
+  .search-box,
+  .results {
+      width: 100%;
+  }
+
+  .results {
+      padding-top: 0;
+  }
+}

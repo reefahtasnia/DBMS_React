@@ -1,0 +1,172 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+body {
+  background-image: url("assets/pink\ pg\ 2.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}
+.navbar {
+  background: linear-gradient(45deg, #ffefd4, #f5918b);
+  padding: 1rem 0;
+  box-shadow: 0 8px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between !important; /* This will separate the logo and the nav elements */
+  align-items: center !important;
+}
+.navbar .navbar-brand {
+  font-size: 2.5rem;
+  color: rgb(255, 44, 121);
+  font-family: "Dancing Script", cursive;
+  font-weight: 700;
+}
+.navbar .navbar-brand:hover {
+  color: hsl(277, 100%, 50%);
+}
+.navbar .navbar-brand:active {
+  color: #814c74;
+  font-size: 2.52rem;
+}
+.navbar .nav-link {
+  font-size: 1.2rem;
+  color: black;
+  margin-right: 10px;
+  margin-left: 10px;
+  text-transform: uppercase;
+  font-family: "Lora", serif;
+  font-weight: 500l;
+}
+.navbar .nav-link:hover {
+  color: hsl(277, 100%, 50%);
+  transform: scale(1.1);
+}
+.navbar .nav-link:active {
+  color: rgb(255, 0, 191);
+  transform: translate(2px, 2px);
+}
+.navbar .btn {
+  font-size: 20px;
+  color: black;
+  height: 40px;
+  width: 100px;
+  border-radius: 5px;
+  text-transform: uppercase;
+  outline: none;
+  border: none;
+  border: 1px solid rgb(255, 0, 195);
+  box-shadow: 0 2px 4px rgba(100, 100, 100, 0.1), 0 0 4px rgb(0, 0, 0);
+  font-family: "Dancing Script", cursive;
+}
+.navbar .btn:hover {
+  background-color: hsl(277, 100%, 50%);
+  color: white;
+  transform: scale(1.1);
+}
+.center-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(
+    100vh - 200px
+  ); /* Adjust the 56px based on the height of your navbar */
+  width: 100%;
+}
+.wrapper {
+  box-sizing: border-box;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0px 10px 25px 0px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+}
+.wrapper h1 {
+  margin-bottom: 20px;
+  font-size: 50px;
+}
+.wrapper .input-box {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+  position: relative;
+}
+.wrapper .input-box input {
+  width: 250px;
+  height: 40px;
+  padding: 10px;
+  font-size: 1.1em;
+  border: none;
+  outline: none;
+  border: 0.5px solid rgb(0, 0, 0);
+  border-radius: 15px;
+}
+.wrapper .input-box input:focus {
+  border: 1px solid rgb(0, 0, 0);
+  box-shadow: 0 0 5px rgb(0, 0, 0);
+}
+.wrapper i {
+  position: absolute;
+  top: 50%;
+  right: 35px;
+  transform: translateY(-50%);
+  font-size: 1.2em;
+  color: rgb(0, 0, 0);
+}
+.wrapper .forgot-pass a {
+  text-decoration: none;
+  color: rgb(0, 17, 255);
+  font-size: 1.1em;
+}
+.wrapper .forgot-pass a:hover {
+  text-decoration: underline;
+}
+.wrapper .forgot-pass a:active {
+  color: rgb(0, 0, 0);
+}
+.wrapper .btn {
+  height: 40px;
+  width: 30%;
+  border: none;
+  outline: none;
+  background-color: rgb(29, 179, 210);
+  color: white;
+  font-weight: 700;
+  font-size: 20px;
+  box-shadow: 0 4px 5px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+  text-transform: uppercase;
+}
+.wrapper .btn:hover {
+  background-color: rgb(172, 248, 255);
+  color: rgb(0, 0, 0);
+  font-weight: 700;
+  font-size: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: scale(1.1);
+}
+.wrapper .btn:active {
+  transform: translate(1px, 1px);
+  border: none;
+  outline: none;
+  border: 1px solid black;
+}
+.wrapper .signup {
+  margin-top: 10px;
+  font-size: 1.1em;
+}
+.wrapper .signup a {
+  text-decoration: none;
+  color: rgb(0, 17, 255);
+}
+.wrapper .signup a:hover {
+  text-decoration: underline;
+}
+.wrapper .signup a:active {
+  color: rgb(0, 0, 0);
+}

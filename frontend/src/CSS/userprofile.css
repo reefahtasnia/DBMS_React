@@ -1,0 +1,143 @@
+.navbar {
+  background: linear-gradient(45deg, #ffefd4, #f5918b);
+  padding: 1rem 0;
+  box-shadow: 0 8px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.navbar .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.navbar .navbar-header {
+  display: flex;
+  align-items: center;
+}
+
+.navbar .logo {
+  max-width: 70px;
+  height: auto;
+  margin-right: 15px;
+}
+
+.navbar .navbar-brand {
+  font-size: 2.5rem;
+  color: rgb(255, 44, 121);
+  font-family: "Dancing Script", cursive;
+  font-weight: 700;
+}
+
+.navbar .navbar-brand:hover {
+  color: hsl(277, 100%, 50%);
+}
+
+.navbar .navbar-brand:active {
+  color: #814c74;
+  font-size: 2.52rem;
+}
+
+.navbar .navbar-collapse {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.navbar .navbar-nav {
+  display: flex;
+  align-items: center;
+}
+
+.navbar .nav-item {
+  list-style: none;
+}
+
+.navbar .nav-link {
+  font-size: 1.2rem;
+  color: black;
+  margin-right: 10px;
+  margin-left: 10px;
+  text-transform: uppercase;
+  font-family: "Lora", serif;
+  font-weight: 500;
+}
+
+.navbar .nav-link:hover {
+  color: hsl(277, 100%, 50%);
+  transform: scale(1.1);
+}
+
+.navbar .nav-link:active {
+  color: rgb(255, 0, 191);
+  transform: translate(2px, 2px);
+}
+
+.navbar .btn {
+    font-size: 20px;
+    color: black;
+    height: 40px;
+    width: 100px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    align-items: center;
+    outline: none;
+    border: none;
+    border: 1px solid rgb(255, 0, 195);
+    box-shadow: 0 2px 4px rgba(100, 100, 100, 0.1), 0 0 4px rgb(0, 0, 0);
+    font-family: "Dancing Script", cursive;
+  }
+  
+.navbar .btn:hover {
+  background-color: hsl(277, 100%, 50%);
+  color: white;
+  transform: scale(1.1);
+}
+
+.navbar .menu-toggle {
+  display: none;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.navbar .menu-icon {
+  height: 24px;
+  width: 24px;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    justify-content: space-between;
+  }
+
+  .navbar .navbar-collapse {
+    display: none;
+  }
+
+  .navbar .menu-toggle {
+    display: block;
+  }
+
+  .navbar .mobile-menu {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .navbar .mobile-menu.hidden {
+    display: none;
+  }
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}

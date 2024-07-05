@@ -1,0 +1,240 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+.navbar {
+  background: linear-gradient(45deg, #ffefd4, #f5918b);
+  padding: 1rem 0;
+  box-shadow: 0 8px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between !important; /* This will separate the logo and the nav elements */
+  align-items: center !important;
+}
+.navbar .navbar-brand {
+  font-size: 2.5rem;
+  color: rgb(255, 44, 121);
+  font-family: "Dancing Script", cursive;
+  font-weight: 700;
+}
+.navbar .navbar-brand:hover {
+  color: hsl(277, 100%, 50%);
+}
+.navbar .navbar-brand:active {
+  color: #814c74;
+  font-size: 2.52rem;
+}
+.navbar .nav-link {
+  font-size: 1.2rem;
+  color: black;
+  margin-right: 10px;
+  margin-left: 10px;
+  text-transform: uppercase;
+  font-family: "Lora", serif;
+  font-weight: 500l;
+}
+.navbar .nav-link:hover {
+  color: hsl(277, 100%, 50%);
+  transform: scale(1.1);
+}
+.navbar .nav-link:active {
+  color: rgb(255, 0, 191);
+  transform: translate(2px, 2px);
+}
+.navbar .btn {
+  font-size: 20px;
+  color: black;
+  height: 40px;
+  width: 100px;
+  border-radius: 5px;
+  text-transform: uppercase;
+  outline: none;
+  border: none;
+  border: 1px solid rgb(255, 0, 195);
+  box-shadow: 0 2px 4px rgba(100, 100, 100, 0.1), 0 0 4px rgb(0, 0, 0);
+  font-family: "Dancing Script", cursive;
+}
+.navbar .btn:hover {
+  background-color: hsl(277, 100%, 50%);
+  color: white;
+  transform: scale(1.1);
+}
+.main {
+  background-image: url("assets/homepagebg.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-position: 0% 20%;
+  height: 80vh;
+  width: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.main h1 {
+  font-size: 4rem;
+  font-weight: 500;
+  color: white;
+  font-family: 'Dancing Script', cursive; 
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+}
+.main .btn1 {
+  height: 40px;
+  width: 35%;
+  border: none;
+  outline: none;
+  border-radius: 60px;
+  background-color: hsl(277, 100%, 50%);
+  color: white;
+  font-weight: 700;
+  font-size: 25px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.main .btn1:hover {
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+  transform: scale(1.1);
+  border: none;
+  outline: none;
+  border: 1px solid hsl(277, 100%, 50%);
+}
+.main .btn1:active {
+  border-color: hsl(277, 100%, 50%);
+  color: hsl(277, 100%, 50%);
+  transform: translate(2px, 4px);
+}
+.image-heading {
+  margin-top: 20px;
+  margin-bottom: -15px;
+}
+.feature h1 {
+  font-size: 5rem;
+  background: #ff92f8;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+.feature .card {
+  background: linear-gradient(45deg, #ffffff, #f9aeaa);
+  transition: transform 0.3s ease;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  height: 100%;
+}
+
+.feature .card:hover {
+  transform: scale(1.1);
+}
+
+.feature .card .card-body {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.feature .card .img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.feature .card:last-child {
+  margin-right: 0;
+}
+.main2 {
+  background-image: url("assets/doctorbookbg.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-position: 0% 20%;
+  height: 80vh;
+  width: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.main2 h1 {
+  font-size: 4rem;
+  font-weight: 400;
+  color: rgb(168, 80, 249);
+  font-family: "Dancing Script", cursive;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+.main2 .btn1 {
+  height: 45px;
+  width: 40%;
+  border: none;
+  outline: none;
+  border-radius: 60px;
+  background-color: hsl(277, 100%, 50%);
+  color: white;
+  font-weight: 700;
+  font-size: 25px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.main2 .btn1:hover {
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+  transform: scale(1.1);
+  border: none;
+  outline: none;
+  border: 1px solid hsl(277, 100%, 50%);
+}
+.main2 .btn1:active {
+  border-color: hsl(277, 100%, 50%);
+  color: hsl(277, 100%, 50%);
+  transform: translate(2px, 4px);
+}
+
+.footer {
+  background-color: whitesmoke;
+  border-top: 5px solid rgba(0, 0, 0, 0.1);
+  margin-top: 80px;
+}
+.footer .btn2 {
+  height: 40px;
+  width: 38%;
+  border: none;
+  outline: none;
+  border-radius: 20px;
+  background-color: rgb(221, 31, 255);
+  color: white;
+  font-weight: 700;
+  font-size: 20px;
+  box-shadow: 0 4px 5px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  text-transform: uppercase;
+}
+.footer .btn2:hover {
+  background-color: rgb(172, 248, 255);
+  color: rgb(238, 141, 255);
+  font-weight: 700;
+  font-size: 25px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: scale(1.1);
+  border: none;
+  outline: none;
+  border: 1px solid black; /* Add this line to add a black border */
+}
+.footer .btn2:active {
+  border-color: 2px solid black;
+  transform: translate(1px, 1px);
+}
+
+.footer h4 {
+  margin-top: 40px;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+.footer p {
+  font-size: 1rem;
+  margin-top: 10px;
+  margin-right: 15px;
+}
+.footer a {
+  color: black;
+  text-decoration: none;
+  font-size: 1srem;
+}
+.footer .fa {
+  font-size: 2rem;
+  margin-right: 10px;
+  cursor: pointer;
+}
