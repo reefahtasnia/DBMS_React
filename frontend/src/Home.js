@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './CSS/home.css';
 import logo from './CSS/assets/logo2fotor.png';
 import medicalHistory from './CSS/assets/medical_history2.png';
