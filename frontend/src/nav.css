@@ -1,16 +1,12 @@
-* {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-}
-
 .navbar {
   background: linear-gradient(45deg, #ffefd4, #f5918b);
   padding: 1rem 0;
   box-shadow: 0 8px 8px rgba(0, 0, 0, 0.1);
   display: flex;
+  font-family: "Lora", serif;
   justify-content: space-between !important;
   align-items: center !important;
+  margin-bottom: -20px;
 }
 
 .navbar .logo {
@@ -22,7 +18,6 @@
 .navbar .navbar-brand {
   font-size: 2.5rem;
   color: rgb(255, 44, 121);
-  font-family: "Dancing Script", cursive;
   font-weight: 700;
 }
 
@@ -43,6 +38,7 @@
   text-transform: uppercase;
   font-family: "Lora", serif;
   font-weight: 500;
+  text-decoration: none; /* Ensure links have no underline */
 }
 
 .navbar .nav-link:hover {
@@ -66,7 +62,7 @@
   border: none;
   border: 1px solid rgb(255, 0, 195);
   box-shadow: 0 2px 4px rgba(100, 100, 100, 0.1), 0 0 4px rgb(0, 0, 0);
-  font-family: "Dancing Script", cursive;
+  font-family: "Lora", serif; /* Changed to 'Lora' */
 }
 
 .navbar .btn:hover {
@@ -74,3 +70,18 @@
   color: white;
   transform: scale(1.1);
 }
+.nav-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.nav-user-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #e91e63; /* Same pink color as the h1 tag */
+}
+

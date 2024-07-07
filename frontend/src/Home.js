@@ -1,6 +1,7 @@
 import React from 'react';
 import './CSS/home.css';
-import logo from './CSS/assets/logo2fotor.png';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min';
 import medicalHistory from './CSS/assets/medical_history2.png';
 import doctorPatient from './CSS/assets/doctor and patient.png';
 import reminders from './CSS/assets/reminders.png';
@@ -14,6 +15,7 @@ import babyWipes from './CSS/assets/baby_wipes.jpg';
 import maternityDress from './CSS/assets/maternity_dress.png';
 import stretchMarkOil from './CSS/assets/stretch_mark_oil.jpg';
 
+
 const Home = () => {
   return (
     <div>
@@ -22,7 +24,7 @@ const Home = () => {
           <div className="row py-4">
             <div className="col-lg-7 pt-5 text-center">
               <h1 className="pt-5">Because you matter the most in motherhood</h1>
-              <button className="btn1 mt-3" id="loginButton">Get Started</button>
+              <button className="btn1 mt-3" id="loginButton" onClick={(e) => window.location.href = '/signup'}>Get Started</button>
             </div>
           </div>
         </div>
