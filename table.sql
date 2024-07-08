@@ -48,3 +48,19 @@ SELECT * FROM doctors
       WHERE TRIM(LOWER(practiced_area)) = TRIM(LOWER('Khulna'))
       AND TRIM(LOWER(department)) = TRIM(LOWER('Neurology'));
 COMMIT;
+
+CREATE TABLE Medical_History (
+    user_id INT,
+    year INT,
+    incident VARCHAR(255),
+    treatment VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES User(user_id)
+);
+
+CREATE TABLE Doctor (
+    BMDC_no INT PRIMARY KEY,
+    name VARCHAR(100),
+    Clinic_Name VARCHAR2(100),
+    visiting_card BFILE,
+    NID_Pic BFILE
+);

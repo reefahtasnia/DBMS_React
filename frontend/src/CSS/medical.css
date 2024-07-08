@@ -1,0 +1,123 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  html, body {
+    height: 100%;
+  }
+  body {
+    font-family: 'Lora', serif;
+    background-color: #f9f9f9;
+  }
+  .container {
+    margin-top: 30px;
+  }
+  
+  .card {
+    margin-bottom: 20px;
+  }
+  
+  .card-header {
+    background-color: #e67bad;
+    color: white;
+  }
+  
+  .table-borderless td, .table-borderless th {
+    border: 0;
+  }
+  
+  .table-borderless tbody tr td {
+    padding: 10px;
+  }
+  
+  .table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+  }
+  
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .blue-table {
+    background-color: #e3f2fd;
+  }
+  
+  .form-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .btn-primary {
+    background-color: rgb(255, 44, 121);
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  
+  .btn-primary:hover {
+    background-color: #b8179d;
+  }
+  
+  .btn-success {
+    background-color: green;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #ffffff;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .btn-success:hover {
+    background-color: darkgreen;
+  }
+  
+  /* Add any necessary styles for the new elements */
+  #historyContainer {
+    margin-top: 20px;
+  }
+  
+  /* Add any additional styles for the modal */
+  .modal-content {
+    padding: 20px;
+  }
+  
+  .form-check-input {
+    margin: 0;
+  }
+  
+  .btn-info {
+    background-color: rgb(255, 44, 121);
+    border-color: rgb(255, 44, 121);
+    margin-left: auto;
+    color: #ffff;
+  }
+  
+  .btn-info:hover {
+    background-color: #b8179d;
+    border-color: #b8179d;
+    color: #ffff;
+  }
+  
+  .btn-danger {
+    background-color: #b8179d;
+    border-color: #b8179d;
+    color: #ffff;
+  }
+  
+  .btn-danger:hover {
+    background-color: #b8179d;
+    border-color: #b8179d;
+    color: #fff;
+  }
+  

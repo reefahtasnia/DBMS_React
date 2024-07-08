@@ -5,7 +5,8 @@ import Signup from "./signup";
 import Login from "./login";
 import UserProfile from "./patient_profile";
 import Appointment from "./Appointment.js";
-import DoctorResults from "./DoctorResults.js";
+import Medical from "./Medical.js";
+
 import PrivateComponent from "./PrivateComponent";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
@@ -23,8 +24,10 @@ function App() {
           </Route>
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/doctor" element={<Appointment />} />
-          <Route path="/DoctorResults" element={<DoctorResults />} />
+          <Route path="/appointment" element={<Appointment />} />
+          <Route path="/medical" element={<Medical />} />
+
+          
         </Routes>
       </BrowserRouter>
     </div>
