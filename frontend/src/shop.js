@@ -9,42 +9,51 @@ import babyWipes from './CSS/assets/baby_wipes.jpg';
 import maternityDress from './CSS/assets/maternity_dress.png';
 import stretchMarkOil from './CSS/assets/stretch_mark_oil.jpg';
 import './CSS/shop.css';
+import axios from 'axios';
 
 const products = [
-  [
-    {
-      image: pregnancyPillow,
-      title: 'Pregnancy Pillow',
-      price: 'Tk 130.00'
-    },
-    {
-      image: prenatalVitamins,
-      title: 'Vitamins',
-      price: 'Tk 150.00'
-    },
-    {
-      image: diaper,
-      title: 'Diapers',
-      price: 'Tk 200.00'
-    }
-  ],
-  [
-    {
-      image: babyWipes,
-      title: 'Baby Wipes',
-      price: 'Tk 80.00'
-    },
-    {
-      image: maternityDress,
-      title: 'Maternity Dresses',
-      price: 'Tk 300.00'
-    },
-    {
-      image: stretchMarkOil,
-      title: 'Stretch Mark Oil',
-      price: 'Tk 100.00'
-    }
-  ]
+  {
+    id: 1,
+    image: pregnancyPillow,
+    title: 'Pregnancy Pillow',
+    price: '130.00',
+    quantity: '1'
+  },
+  {
+    id: 2,
+    image: prenatalVitamins,
+    title: 'Vitamins',
+    price: '150.00',
+    quantity: '1'
+  },
+  {
+    id: 3,
+    image: diaper,
+    title: 'Diapers',
+    price: '200.00',
+    quantity: '1'
+  },
+  {
+    id: 4,
+    image: babyWipes,
+    title: 'Baby Wipes',
+    price: '80.00',
+    quantity: '1'
+  },
+  {
+    id: 5,
+    image: maternityDress,
+    title: 'Maternity Dresses',
+    price: '300.00',
+    quantity: '1'
+  },
+  {
+    id: 6,
+    image: stretchMarkOil,
+    title: 'Stretch Mark Oil',
+    price: '100.00',
+    quantity: '1'
+  }
 ];
 
 const Shop = () => {
@@ -59,10 +68,23 @@ const Shop = () => {
 
   const navigate = useNavigate();
 
-  const addToCart = (product) => {
-    setCart([...cart, product]);
+  const addToCart = async (product) => {
+    try {
+      await axios.post('http://localhost:3001/api/cart', {
+        productId: product.id,
+        title: product.title,
+        price: product.price,
+        quantity: product.quantity
+      });
+      setCart([...cart, product]);
+      alert("Item added to cart succesfully!");
+    } catch (error) {
+      alert("Item already added to cart");
+      console.error('Error adding product to cart:', error);
+    }
   };
-
+  
+  
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
     if (name === 'all') {
@@ -168,28 +190,24 @@ const Shop = () => {
                 <Link to="/cart" className="btn btn-primary ml-3">Cart</Link>
               </div>
             </div>
-            {products.map((productRow, rowIndex) => (
-              <div className="row" key={rowIndex}>
-                {productRow.map((product, productIndex) => (
-                  <div className="col-lg-4 col-md-6 col-sm-12 pb-1" key={productIndex}>
-                    <div className="card product-item border-0 mb-4">
-                      <div className="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
-                        <img className="img-fluid w-100" src={product.image} alt={product.title} />
-                      </div>
-                      <div className="card-body border-left border-right text-center p-0 pt-4 pb-3">
-                        <h6 className="text-truncate mb-3">{product.title}</h6>
-                        <div className="d-flex justify-content-center">
-                          <h6>{product.price}</h6>
-                        </div>
-                      </div>
-                      <div className="card-footer d-flex justify-content-between bg-light border">
-                        <button onClick={() => addToCart(product)} className="btn btn-sm text-dark p-0">
-                          <i className="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart
-                        </button>
-                      </div>
+            {products.map((product, index) => (
+              <div className="col-lg-4 col-md-6 col-sm-12 pb-1" key={index}>
+                <div className="card product-item border-0 mb-4">
+                  <div className="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                    <img className="img-fluid w-100" src={product.image} alt={product.title} />
+                  </div>
+                  <div className="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                    <h6 className="text-truncate mb-3">{product.title}</h6>
+                    <div className="d-flex justify-content-center">
+                      <h6>{product.price}</h6>
                     </div>
                   </div>
-                ))}
+                  <div className="card-footer d-flex justify-content-between bg-light border">
+                    <button onClick={() => addToCart(product)} className="btn btn-sm text-dark p-0">
+                      <i className="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
             <div className="col-12 pb-1">

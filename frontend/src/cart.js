@@ -1,32 +1,73 @@
-import React, { useState } from 'react';
-import './CSS/cart.css'; // Adjust the path as needed
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import './CSS/cart.css'; // Adjust the path to your CSS file
 
 const Cart = () => {
-  const [products, setProducts] = useState([
-    { id: 1, name: 'Product 1', price: 150, quantity: 1 },
-    { id: 2, name: 'Product 2', price: 150, quantity: 1 },
-    { id: 3, name: 'Product 3', price: 150, quantity: 1 },
-  ]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const handleQuantityChange = (id, change) => {
-    setProducts(products.map(product => {
-      if (product.id === id) {
-        const newQuantity = product.quantity + change;
-        if (newQuantity > 0) {
-          return { ...product, quantity: newQuantity };
-        }
+  useEffect(() => {
+    // Fetch the cart data from the backend
+    const fetchCartData = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/api/cart');
+        // Ensure quantity starts from the value in the database, defaulting to 1 if not set
+        const updatedProducts = response.data.map(product => ({
+          ...product,
+          quantity: product.quantity || 1
+        }));
+        setProducts(updatedProducts);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching cart data:', error);
+        setError('Error fetching cart data. Please try again later.');
+        setLoading(false);
       }
-      return product;
-    }));
+    };
+
+    fetchCartData();
+  }, []);
+
+  const handleQuantityChange = async (id, change) => {
+    // Update local state
+    setProducts(prevProducts =>
+      prevProducts.map(product => {
+        if (product.productId === id) {
+          const newQuantity = product.quantity + change;
+          return { ...product, quantity: newQuantity > 0 ? newQuantity : product.quantity };
+        }
+        return product;
+      })
+    );
+
+    // Update the quantity in the database
+    try {
+      await axios.put(`http://localhost:3001/api/cart/${id}`, { change });
+    } catch (error) {
+      console.error('Error updating cart data:', error);
+    }
   };
 
-  const handleRemove = id => {
-    setProducts(products.filter(product => product.id !== id));
+  const handleRemove = async (id) => {
+    try {
+      // Make DELETE request to backend API
+      await axios.delete(`http://localhost:3001/api/cart/${id}`);
+      
+      // Update local state after successful deletion
+      setProducts(prevProducts => prevProducts.filter(product => product.productId !== id));
+    } catch (error) {
+      console.error('Error removing product from cart:', error);
+      setError('Error removing product from cart. Please try again later.');
+    }
   };
 
   const subtotal = products.reduce((acc, product) => acc + product.price * product.quantity, 0);
   const shipping = 10;
   const total = subtotal + shipping;
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div>
@@ -56,26 +97,30 @@ const Cart = () => {
               </thead>
               <tbody className="align-middle">
                 {products.map(product => (
-                  <tr key={product.id}>
-                    <td className="align-middle">{product.name}</td>
+                  <tr key={product.productId}>
+                    <td className="align-middle">{product.title}</td>
                     <td className="align-middle">Tk {product.price}</td>
                     <td className="align-middle">
                       <div className="input-group quantity mx-auto" style={{ width: '100px' }}>
                         <div className="input-group-btn">
-                          <button className="btn btn-sm btn-primary btn-minus" onClick={() => handleQuantityChange(product.id, -1)}>
+                          <button className="btn btn-sm btn-primary btn-minus" onClick={() => handleQuantityChange(product.productId, -1)}>
                             <i className="fa fa-minus"></i>
                           </button>
                         </div>
                         <input type="text" className="form-control form-control-sm bg-secondary text-center" value={product.quantity} readOnly />
                         <div className="input-group-btn">
-                          <button className="btn btn-sm btn-primary btn-plus" onClick={() => handleQuantityChange(product.id, 1)}>
+                          <button className="btn btn-sm btn-primary btn-plus" onClick={() => handleQuantityChange(product.productId, 1)}>
                             <i className="fa fa-plus"></i>
                           </button>
                         </div>
                       </div>
                     </td>
                     <td className="align-middle">Tk {product.price * product.quantity}</td>
-                    <td className="align-middle"><button className="btn btn-sm btn-primary" onClick={() => handleRemove(product.id)}><i className="fa fa-times"></i></button></td>
+                    <td className="align-middle">
+                      <button className="btn btn-sm btn-primary" onClick={() => handleRemove(product.productId)}>
+                        <i className="fa fa-times"></i>
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
