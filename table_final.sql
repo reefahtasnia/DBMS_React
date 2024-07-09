@@ -7,7 +7,7 @@ CREATE TABLE Users (
     userid NUMBER DEFAULT user_id_seq.NEXTVAL NOT NULL,
     firstname VARCHAR(50) NOT NULL,
     lastname VARCHAR(50) NOT NULL,
-    fullname VARCHAR2(255) GENERATED ALWAYS AS (firstname || ' ' || lastname),
+    fullname VARCHAR2(255) GENERATED ALWAYS AS (firstname || ' ' || lastname) [virtual],
     email VARCHAR(255) NOT NULL,
     date_of_birth DATE,
     blood_group VARCHAR(5),
