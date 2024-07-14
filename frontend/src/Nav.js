@@ -7,16 +7,31 @@ import logo from "./logo2fotor.png";
 const Navbar = () => {
   const auth = localStorage.getItem("user");
   const navigate = useNavigate();
-
-  const handleIconClick = () => {
-    navigate(auth ? "/Patient" : "/login");
-  };
-
   const logout = () => {
     alert("Logged out successfully");
     localStorage.removeItem('user');
-    navigate("/");
+    localStorage.removeItem('userType');
+    localStorage.removeItem('doctor');
+    localStorage.removeItem('userdata');
+    navigate("/login");
   };
+  const handleIconClick = () => {
+    if(auth){
+      logout();
+    }
+    else{
+      navigate("/login");
+    }
+  };
+  const handleClick=()=>{ 
+    if(auth){
+      navigate("/Patient");
+    }
+    else{
+      navigate("/login");
+    }
+  }
+
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -54,15 +69,17 @@ const Navbar = () => {
               </Link>
             </li>
           </ul>
-          <div className="nav-icon-container" onClick={handleIconClick}>
+          <div className="nav-icon-container" onClick={handleClick}>
+            <Link to="/Patient">
               <img
                 src={userIcon}
                 alt="User Icon"
                 className="nav-user-icon"
               />
+              </Link>
             </div>
           <button className="btn" type="button" onClick={handleIconClick}>
-            {auth ? "Profile" : "Log In"}
+            {auth ? "Log Out" : "Log In"}
           </button>
         </div>
       </div>

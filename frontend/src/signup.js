@@ -12,10 +12,7 @@ const Signup = () => {
   const [userType, setUserType] = useState("Select a user account");
 
   useEffect(() => {
-    const auth=localStorage.getItem('user');
-    if(auth){
-      window.location.href="/";
-    }
+    const auth = localStorage.getItem('user');
     const select = document.querySelector(".select");
     const caret = document.querySelector(".caret");
     const menu = document.querySelector(".menu");
@@ -63,58 +60,58 @@ const Signup = () => {
   const handleSignup = (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
+        alert("Passwords do not match");
+        return;
     }
 
     const user = {
-      firstname,
-      lastname,
-      email,
-      password,
-      dob,
+        firstname,
+        lastname,
+        email,
+        password, // Consider security implications
+        dob,
     };
 
-    console.log("Sending signup request:", user);
+    if (userType === "doctor") {
+        // Store necessary information in local storage
+        localStorage.setItem("doctorData", JSON.stringify({
+            fullname: firstname + ' ' + lastname,
+            email: email,
+            dob: dob,
+            password:password
+        }));
 
-    fetch(`http://localhost:5000/api/signup`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(user),
-    })
-    .then(response => {
-      // Check if the response is in JSON format
-      const contentType = response.headers.get("content-type");
-      if (!response.ok) {
-        throw new Error('Response not OK');
-      } else if (!contentType || !contentType.includes('application/json')) {
-        throw new TypeError("Oops, we haven't got JSON!");
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log("Signup response data:", data);
-      if (data.message === "User created successfully") {
-        alert("User created successfully");
-        localStorage.setItem("user", JSON.stringify({ userId: data.userId, email }));
-        window.location.href = userType === "user" ? "/login" : "/doctorsignup";
-      } else {
-        alert(data.message);
-      }
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      alert("An error occurred during signup");
-    });
-    setFirstname("");
-    setLastname("");
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-    setDob("");
-  };
+        // Redirect to DoctorSignup without waiting for server response
+        window.location.href = "/DoctorSignup";
+    } else {
+        // Proceed with normal signup process
+        console.log("Sending signup request:", user);
+
+        fetch(`http://localhost:5000/api/signup`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(user),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Signup failed');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Signup response data:", data);
+            localStorage.setItem("user", JSON.stringify({ userId: data.userId, email }));
+            window.location.href = "/login"; // Redirect to login on success for regular users
+        })
+        .catch(error => {
+            console.error("Error during signup:", error);
+            alert("An error occurred during signup");
+        });
+    }
+};
+
 
   return (
     <>
@@ -241,7 +238,7 @@ const Signup = () => {
               </label>
             </div>
             <button type="submit" className="btn" id="signupbtn">
-              Next
+              {userType === "doctor" ? "Next" : "Sign Up"}
             </button>
             <div className="login">
               <p>

@@ -122,7 +122,7 @@ app.post('/api/medical-history/delete', async (req, res) => {
 app.get('/api/doctors', async (req, res) => {
   let conn;
   const searchQuery = req.query.search;
-  let sql = 'SELECT * FROM doctors';
+  let sql = 'SELECT * FROM doctor';
   let params = [];
 
   if (searchQuery) {

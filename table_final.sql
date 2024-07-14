@@ -7,7 +7,7 @@ CREATE TABLE Users (
     userid NUMBER DEFAULT user_id_seq.NEXTVAL NOT NULL,
     firstname VARCHAR(50) NOT NULL,
     lastname VARCHAR(50) NOT NULL,
-    fullname VARCHAR2(255) GENERATED ALWAYS AS (firstname || ' ' || lastname) [virtual],
+    fullname VARCHAR2(255) GENERATED ALWAYS AS (firstname || ' ' || lastname),
     email VARCHAR(255) NOT NULL,
     date_of_birth DATE,
     blood_group VARCHAR(5),
@@ -39,8 +39,8 @@ CREATE TABLE Doctors (
 
 CREATE TABLE Passwords (
     userid NUMBER ,
-    hashed_password VARCHAR(255),
     BMDC VARCHAR(100),
+    hashed_password VARCHAR(255),
     CONSTRAINT FK_USERID FOREIGN KEY (userid) REFERENCES Users(userid) ON DELETE CASCADE,
     CONSTRAINT FK_BMDC FOREIGN KEY (BMDC) REFERENCES Doctors(BMDC) ON DELETE CASCADE
 );

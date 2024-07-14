@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from "react";
-import "./CSS/userprofile.css"; // Adjust the path as necessary
+import "./CSS/userprofile.css";
 
-const UserProfile = () => {
-  const auth = JSON.parse(localStorage.getItem("user"));
+const DoctorProfile = () => {
   const [profileImage, setProfileImage] = useState("https://via.placeholder.com/150");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [dob, setDob] = useState("");
   const [phone, setPhone] = useState("");
-  const [bloodGroup, setBloodGroup] = useState("");
-  const [address, setAddress] = useState("");
-
+  const [dept, setDept] = useState("");
+  const [mbbsYear, setMBBSyear] = useState("");
+  const [pracChamber, setPracChamber] = useState("");
+  const [hosp, setHosp] = useState("");
+  const triggerFileInput = () => {
+    document.getElementById("fileInput").click();
+  };
+  const capitalizeWords = (string) => {
+    return string.toLowerCase().replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+  };  
   useEffect(() => {
-    if (auth && auth.userId) {
-      const url = `http://localhost:5000/api/user?userId=${auth.userId}`;
+    const auth = JSON.parse(localStorage.getItem("user"));
+    if (auth && auth.BMDC) {
+      const url = `http://localhost:5000/api/doctoruser?BMDC=${auth.BMDC}`;
       fetch(url)
         .then(response => {
           if (!response.ok) {
@@ -22,34 +28,23 @@ const UserProfile = () => {
           return response.json();
         })
         .then(data => {
-          console.log("Fetched user data:", data);
-          localStorage.setItem("userdata", JSON.stringify(data));
-          setProfileData(data);
+          console.log("Fetched data:", data);  // Log the fetched data
+          setFullName(capitalizeWords(data[1] || ""));
+          setEmail(capitalizeWords(data[2] || ""));
+          setPhone(data[4] || "");  // Phone numbers typically do not need capitalization
+          setDept(capitalizeWords(data[5] || ""));
+          setMBBSyear(data[6] || "");  // Assuming MBBS year does not need capitalization
+          setPracChamber(capitalizeWords(data[8] || ""));
+          setHosp(capitalizeWords(data[7] || ""));
+          setProfileImage(data.profileImage || "https://via.placeholder.com/150");
         })
         .catch(error => {
-          console.error("Failed to fetch user:", error.message);
-          alert(`Failed to load user data: ${error.message}`);
+          console.error("Failed to fetch doctor data:", error);
+          alert(`Failed to load doctor data: ${error.message}`);
         });
     }
   }, []);
-
-  const setProfileData = (data) => {
-    try {
-      setFullName(data[3] || "John Doe");
-      setEmail(data[4] || "johndoe@gmail.com");
-      setDob(data[5] ? new Date(data[5]).toISOString().slice(0, 10) : '');
-      setPhone(data[7] || '');
-      setBloodGroup(data[6] || '');
-      setAddress(data[8] || '');
-    } catch (error) {
-      console.error("Error setting profile data:", error);
-      throw error; 
-    }
-  };
-
-  const triggerFileInput = () => {
-    document.getElementById("fileInput").click();
-  };
+  
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -58,28 +53,29 @@ const UserProfile = () => {
     }
   };
 
-  const handleSave = (e) => {
-    e.preventDefault();
+  const handleSave = () => {
+    const auth = JSON.parse(localStorage.getItem("user"));
+    if (auth && auth.BMDC) {
+      const updatedDoctor = {
+        BMDC: auth.BMDC,
+        fullname: fullName,
+        email: email,
+        phone: phone,
+        dept: dept,
+        mbbsYear: mbbsYear,
+        hosp: hosp,
+        chamber: pracChamber
+      };
   
-    const updatedUser = {
-      userId: auth.userId,
-      fullName,
-      email,
-      dob,
-      phone,
-      bloodGroup,
-      address,
-    };
+      console.log("Saving updated doctor data:", updatedDoctor);
   
-    console.log("Saving updated user data:", updatedUser);
-  
-    fetch(`http://localhost:5000/api/user/update`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedUser),
-    })
+      fetch(`http://localhost:5000/api/doctor/update`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updatedDoctor)
+      })
       .then(response => {
         if (!response.ok) {
           throw new Error('Response not OK');
@@ -88,19 +84,15 @@ const UserProfile = () => {
       })
       .then(data => {
         console.log("Update response data:", data);
-        if (data.success) {
-          alert("Profile updated successfully");
-        } else {
-          alert(data.message);
-        }
+        alert("Profile updated successfully");
       })
       .catch(error => {
         console.error("Error:", error);
         alert("An error occurred during profile update");
       });
+    }
   };
   
-
   return (
     <div className="profile-container">
       <div className="profile-content">
@@ -146,7 +138,7 @@ const UserProfile = () => {
           </div>
         </div>
         <div className="profile-details">
-          <h3 className="profile-section-title">Profile Details</h3>
+          <h3 className="profile-section-title">Doctor Profile Details</h3>
           <div className="profile-details-grid">
             <div className="profile-detail">
               <label className="profile-detail-label">Full Name</label>
@@ -167,12 +159,21 @@ const UserProfile = () => {
               />
             </div>
             <div className="profile-detail">
-              <label className="profile-detail-label">Date of Birth</label>
+              <label className="profile-detail-label">Department</label>
               <input
-                type="date"
+                type="text"
                 className="profile-detail-input"
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
+                value={dept}
+                onChange={(e) => setDept(e.target.value)}
+              />
+            </div>
+            <div className="profile-detail">
+              <label className="profile-detail-label">MBBS Completion Year</label>
+              <input
+                type="text"
+                className="profile-detail-input"
+                value={mbbsYear}
+                onChange={(e) => setMBBSyear(e.target.value)}
               />
             </div>
             <div className="profile-detail">
@@ -185,30 +186,30 @@ const UserProfile = () => {
               />
             </div>
             <div className="profile-detail">
-              <label className="profile-detail-label">Blood Group</label>
+              <label className="profile-detail-label">Current Hospital</label>
               <input
                 type="text"
                 className="profile-detail-input"
-                value={bloodGroup}
-                onChange={(e) => setBloodGroup(e.target.value)}
+                value={hosp}
+                onChange={(e) => setHosp(e.target.value)}
               />
             </div>
-            <div className="profile-detail profile-detail-full">
-              <label className="profile-detail-label">Address</label>
-              <textarea
+            <div className="profile-detail">
+              <label className="profile-detail-label">Practicing Chamber</label>
+              <input
+                type="text"
                 className="profile-detail-input"
-                rows="3"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                value={pracChamber}
+                onChange={(e) => setpracChamber(e.target.value)}
               />
             </div>
           </div>
         </div>
         <div className="profile-section">
-          <h3 className="profile-section-title">Medical History</h3>
+          <h3 className="profile-section-title">Current Patients</h3>
           <button className="profile-section-button">Edit</button>
           <div className="profile-section-content">
-            <p>No known medical conditions.</p>
+            <p>Currently empty.</p>
           </div>
         </div>
         <div className="profile-section">
@@ -218,13 +219,7 @@ const UserProfile = () => {
             <p>No upcoming appointments.</p>
           </div>
         </div>
-        <div className="profile-section">
-          <h3 className="profile-section-title">Medicine Reminders</h3>
-          <button className="profile-section-button">Edit</button>
-          <div className="profile-section-content">
-            <p>No upcoming appointments.</p>
-          </div>
-        </div>
+
         <div className="profile-actions">
           <button className="profile-action-button delete-button">
             Delete Account
@@ -236,4 +231,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default DoctorProfile;

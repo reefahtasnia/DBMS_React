@@ -18,7 +18,7 @@ import stretchMarkOil from './CSS/assets/stretch_mark_oil.jpg';
 
 const Home = () => {
   return (
-    <div>
+    <div style={{ backgroundColor: 'white' }}>
       <section className="main">
         <div className="container py-5">
           <div className="row py-4">
@@ -118,7 +118,7 @@ const Home = () => {
                 </div>
                 <div className="col-lg-3">
                   <h4>About</h4>
-                  <p><a href="home.html">Home</a></p>
+                  <p><a href="/">Home</a></p>
                   <p><a href="">Features</a></p>
                   <p><a href="">About Us</a></p>
                 </div>

@@ -1,10 +1,10 @@
-CREATE TABLE Doctors (
+CREATE TABLE Doctor (
     name VARCHAR(255),
     department VARCHAR(255),
     location VARCHAR(255),
     experience INT
 );
-INSERT INTO Doctors (name, department, location, experience) VALUES
+INSERT INTO Doctor (name, department, location, experience) VALUES
 ('Dr. John Doe', 'Cardiology', 'Dhaka', 30),
 ('Dr. Jane Smith', 'Neurology', 'Khulna', 25),
 ('Dr. Alice Johnson', 'Pediatrics', 'Chittagong', 20),

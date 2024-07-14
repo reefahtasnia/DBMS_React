@@ -20,11 +20,12 @@ function App() {
           {<Route path="/" element={<Home />} /> }
           <Route element={<PrivateComponent />}>
             <Route path="/Patient" element={<UserProfile />} />
-            <Route path="/Doctor" element={<DoctorProfile />} />
+            
           </Route>
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/DoctorSignup" element={<DoctorSignup />} />
+          <Route path="/Doctor" element={<DoctorProfile />} />
 
         </Routes>
       </BrowserRouter>
