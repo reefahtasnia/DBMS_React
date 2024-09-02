@@ -1,0 +1,26 @@
+create table medicine (
+medicine_code int,
+medicine_name varchar2(100)
+);
+
+CREATE TABLE medicinetracker (
+    id NUMBER NOT NULL,
+    name VARCHAR2(100),
+    dosage VARCHAR2(50),
+    time VARCHAR2(50),
+    CONSTRAINT pk_medicine PRIMARY KEY (id)
+);
+CREATE SEQUENCE medicine_seq
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE OR REPLACE TRIGGER medicine_trigger
+BEFORE INSERT ON medicinetracker
+FOR EACH ROW
+BEGIN
+    SELECT medicine_seq.NEXTVAL INTO :new.id FROM dual;
+END;
+/
+
