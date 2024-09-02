@@ -63,10 +63,9 @@ CREATE TABLE Medicine (
 CREATE TABLE Appointment (
     appointment_id INT PRIMARY KEY,
     BMDC VARCHAR(100),
-    date DATE,
-    time TIME,
-    day VARCHAR(255),
-    FOREIGN KEY (BMDC) REFERENCES Doctors(BMDC_no)
+    appointment_timestamp TIMESTAMP,  -- Use TIMESTAMP for date and time together
+    day_of_week VARCHAR(255),
+    FOREIGN KEY (BMDC) REFERENCES Doctors(BMDC)
 );
 CREATE TABLE Books (
     booking_id INT PRIMARY KEY,
