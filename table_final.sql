@@ -62,11 +62,11 @@ CREATE TABLE Medicine (
 );
 CREATE TABLE Appointment (
     appointment_id INT PRIMARY KEY,
-    BMDC_no INT,
+    BMDC VARCHAR(100),
     date DATE,
     time TIME,
     day VARCHAR(255),
-    FOREIGN KEY (BMDC_no) REFERENCES Doctor(BMDC_no)
+    FOREIGN KEY (BMDC) REFERENCES Doctors(BMDC_no)
 );
 CREATE TABLE Books (
     booking_id INT PRIMARY KEY,
