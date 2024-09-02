@@ -1,0 +1,299 @@
+/* Include the provided CSS here */
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  body {
+   
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+  }
+  .navbar {
+    background: linear-gradient(45deg, #ffefd4, #f5918b);
+    padding: 1rem 0;
+    box-shadow: 0 8px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+  .navbar .navbar-brand {
+    font-size: 2.5rem;
+    color: rgb(255, 44, 121);
+    font-family: "Dancing Script", cursive;
+    font-weight: 700;
+  }
+  .navbar .navbar-brand:hover {
+    color: hsl(277, 100%, 50%);
+  }
+  .navbar .navbar-brand:active {
+    color: #814c74;
+    font-size: 2.52rem;
+  }
+  .navbar .nav-link {
+    font-size: 1.2rem;
+    color: black;
+    margin-right: 10px;
+    margin-left: 10px;
+    text-transform: uppercase;
+    font-family: "Lora", serif;
+    font-weight: 500l;
+  }
+  .navbar .nav-link:hover {
+    color: hsl(277, 100%, 50%);
+    transform: scale(1.1);
+  }
+  .navbar .nav-link:active {
+    color: rgb(255, 0, 191);
+    transform: translate(2px, 2px);
+  }
+  .navbar .btn {
+    font-size: 20px;
+    color: black;
+    height: 40px;
+    width: 100px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    outline: none;
+    border: none;
+    border: 1px solid rgb(255, 0, 195);
+    box-shadow: 0 2px 4px rgba(100, 100, 100, 0.1), 0 0 4px rgb(0, 0, 0);
+    font-family: "Dancing Script", cursive;
+  }
+  .navbar .btn:hover {
+    background-color: hsl(277, 100%, 50%);
+    color: white;
+    transform: scale(1.1);
+  }
+  .appointment-form {
+    max-width: 500px;
+    margin: 25px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+  }
+  .appointment-form h1 {
+    text-align: center;
+    font-family: "Dancing Script", cursive;
+    font-size: 2.8rem;
+    color: rgb(254, 104, 159);
+    font-weight: 700;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: large;
+    margin-right: 5px;
+    font-family: "Lora", serif;
+  }
+  input,
+  select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .time-range {
+    display: flex;
+    align-items: center;
+  }
+  .time-range input {
+    width: 45%;
+    margin-right: 10px;
+  }
+  .check-availability {
+    width: 100%;
+    padding: 10px;
+    background-color: #ff69b4;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .check-availability:hover {
+    background-color: #ff4d94;
+  }
+  .check-availability:active {
+    background-color: #ff4d94;
+    transform: translate(2px, 2px);
+  }
+  .popup {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.4); 
+    padding-top: 60px;
+  }
+  .popup-content {
+    background-color: #fefefe;
+    margin: 5% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 40%; 
+    height: 60%; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative; 
+    font-size: 1.5rem;
+    font-family: "Lora", serif;
+    font-weight: 500;
+    color: #333;
+  }
+  .popup-text {
+    text-align: center;
+    width: 90%; 
+    margin: 0 auto; 
+  }
+  .close {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  #redirectBtn {
+    width: 75%;
+    padding: 10px;
+    background-color: #ff69b4;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  #redirectBtn:hover {
+    background-color: #ff4d94;
+  }
+  #redirectBtn:active {
+    background-color: #ff4d94;
+    transform: translate(2px, 2px);
+  }
+  .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+    width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    display: none;
+    z-index: 1000;
+  }
+  
+  .modal.active {
+    display: block;
+  }
+  
+  .add-btn,
+  .submit-btn,
+  .close-btn,
+  .remove-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #ff69b4;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .add-btn:hover,
+  .submit-btn:hover,
+  .close-btn:hover,
+  .remove-btn:hover {
+    background-color: #ff4d94;
+  }
+  
+  .add-btn:active,
+  .submit-btn:active,
+  .close-btn:active,
+  .remove-btn:active {
+    background-color: #ff4d94;
+    transform: translate(2px, 2px);
+  }
+  
+  .medicine-list {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .medicine-item {
+    margin-bottom: 20px;
+  }
+  .autocomplete-dropdown {
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+    position: absolute;
+    background: white;
+    z-index: 1000;
+    width: calc(100% - 20px); /* Adjust as necessary */
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .autocomplete-dropdown li {
+    padding: 8px 10px;
+    cursor: pointer;
+  }
+  
+  .autocomplete-dropdown li:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .prescriptions-list {
+    margin: 20px 0;
+  }
+  
+  .prescription-box {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    position: relative;
+    background-color: #f9f9f9;
+  }
+  
+  .prescription-box strong {
+    display: inline-block;
+    width: 100px;
+  }
+  
+  .remove-prescription-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background-color: transparent;
+    border: none;
+    color: red;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  
