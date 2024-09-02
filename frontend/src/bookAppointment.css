@@ -1,0 +1,137 @@
+/* BookAppointment.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fce4ec;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .navbar {
+    background-color: #f8bbd0;
+  }
+  
+  .navbar-brand {
+    font-size: 24px;
+    font-weight: bold;
+    color: #880e4f;
+  }
+  
+  .navbar-nav .nav-link {
+    color: #880e4f;
+    font-weight: bold;
+  }
+  
+  #loginButton {
+    background-color: #880e4f;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+  }
+  
+  #caloriebtn {
+    background-color: #f48fb1;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+  }
+  
+  .appointment-form {
+    background-color: white;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 600px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .appointment-form h1 {
+    text-align: center;
+    color: #880e4f;
+    margin-bottom: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    font-weight: bold;
+    color: #880e4f;
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+  }
+  
+  .form-group .date-inputs,
+  .form-group .time-inputs {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .form-group .date-inputs select,
+  .form-group .time-inputs select {
+    width: 30%;
+  }
+  
+  .sex-options {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+  }
+  
+  .sex-options label {
+    font-weight: normal;
+    color: #880e4f;
+  }
+  
+  .sex-options input[type="radio"] {
+    margin-right: 5px;
+  }
+  
+  .dropdown-options {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-height: 150px;
+    overflow-y: auto;
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+  }
+  
+  .dropdown-option {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .dropdown-option:hover {
+    background-color: #f8bbd0;
+  }
+  
+  .submit-btn,
+  .reset-btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #880e4f;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  
+  .submit-btn:hover,
+  .reset-btn:hover {
+    background-color: #ad1457;
+  }
+  
