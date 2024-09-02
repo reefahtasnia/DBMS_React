@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import bcrypt from "bcrypt";
 import { connection, run_query } from "./connection.js";
+import { sendEmail } from './sendEmail.js';
 import oracledb from "oracledb";
 
 dotenv.config();
@@ -332,7 +333,6 @@ app.post("/api/doctorLogin", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Fetch the BMDC for the given email from the Doctors table
     const doctorResults = await run_query(
       "SELECT BMDC FROM Doctors WHERE email = UPPER(:email)",
       { email }
@@ -452,5 +452,113 @@ app.post("/api/doctor/update", async (req, res) => {
     }
   }
 });
+
+app.post('/api/send-otp', async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+
+  let conn;
+  try {
+    conn = await connection();
+    let result = await conn.execute(
+      "SELECT userid, email FROM Users WHERE email = :email",
+      [email],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (result.rows.length > 0) {
+      const { USERID } = result.rows[0];
+      const otp = await sendEmail(email, 'Your OTP for Maternity Maven');
+      return res.status(200).json({ message: "OTP sent to your email", otp, userId: USERID });
+    }
+
+    // If not found in Users, check the Doctors table
+    result = await conn.execute(
+      "SELECT BMDC, email FROM Doctors WHERE email = :email",
+      [email],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (result.rows.length > 0) {
+      const { BMDC } = result.rows[0];
+      const otp = await sendEmail(email, 'Your OTP for Maternity Maven');
+      return res.status(200).json({ message: "OTP sent to your email", otp, bmdc: BMDC });
+    }
+
+    // If not found in either table
+    return res.status(404).json({ message: "User or Doctor not found" });
+  } catch (error) {
+    console.error('Error when checking user or sending email:', error);
+    res.status(500).json({ error: "Internal server error", error: error.toString() });
+  } finally {
+    if (conn) {
+      try {
+        await conn.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+});
+
+app.post('/api/reset-password', async (req, res) => {
+  const { password, userId, bmdc } = req.body;
+  const saltRounds = 10;
+
+  if (!password || (!userId && !bmdc)) {
+    return res.status(400).json({ message: 'Password and either User ID or BMDC are required' });
+  }
+
+  try {
+    let selectQuery;
+    let selectParams;
+    console.log(userId);
+    if (userId) {
+      selectQuery = "SELECT hashed_password FROM Passwords WHERE userid = :userId";
+      selectParams = { userId };
+    } else if (bmdc) {
+      selectQuery = "SELECT hashed_password FROM Passwords WHERE BMDC = :bmdc";
+      selectParams = { bmdc };
+    }
+
+    const currentPasswordResult = await run_query(selectQuery, selectParams);
+    const currentPassword = currentPasswordResult.length > 0 ? currentPasswordResult[0][0] : null;
+    console.log(currentPasswordResult);
+    console.log(currentPassword);
+    if (!currentPassword) {
+      return res.status(404).json({ message: 'User or Doctor not found' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    let updateQuery;
+    let updateParams;
+
+    if (userId) {
+      updateQuery = "UPDATE Passwords SET hashed_password = :hashedPassword WHERE userid = :userId";
+      updateParams = { hashedPassword, userId };
+    } else if (bmdc) {
+      updateQuery = "UPDATE Passwords SET hashed_password = :hashedPassword WHERE BMDC = :bmdc";
+      updateParams = { hashedPassword, bmdc };
+    }
+
+    await run_query(updateQuery, updateParams);
+
+    const updatedPasswordResult = await run_query(selectQuery, selectParams);
+    const updatedPassword = updatedPasswordResult.length > 0 ? updatedPasswordResult[0].HASHED_PASSWORD : null;
+
+    if (currentPassword === updatedPassword) {
+      return res.status(500).json({ message: 'Password update failed, please try again.' });
+    }
+
+    res.status(200).json({ message: 'Password reset successfully' });
+  } catch (error) {
+    console.error('Error during password reset:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 
 

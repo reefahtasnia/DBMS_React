@@ -68,12 +68,11 @@ const Signup = () => {
         firstname,
         lastname,
         email,
-        password, // Consider security implications
+        password, 
         dob,
     };
 
     if (userType === "doctor") {
-        // Store necessary information in local storage
         localStorage.setItem("doctorData", JSON.stringify({
             fullname: firstname + ' ' + lastname,
             email: email,
@@ -81,10 +80,8 @@ const Signup = () => {
             password:password
         }));
 
-        // Redirect to DoctorSignup without waiting for server response
         window.location.href = "/DoctorSignup";
     } else {
-        // Proceed with normal signup process
         console.log("Sending signup request:", user);
 
         fetch(`http://localhost:5000/api/signup`, {

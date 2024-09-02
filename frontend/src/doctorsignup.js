@@ -54,7 +54,7 @@ const DoctorSignup = () => {
         .then(data => {
           console.log("Doctor profile created:", data);
           alert("Doctor profile created successfully!");
-          localStorage.removeItem("doctorData"); // Clean up local storage
+          localStorage.removeItem("doctorData"); 
           window.location.href = "/login";
         })
         .catch(error => {

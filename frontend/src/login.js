@@ -95,7 +95,7 @@ const Login = () => {
             </select>
           </div>
           <div className="forgot-pass">
-            <a href="forgotPassword.html">Forgot Password?</a>
+            <a href="/forgot">Forgot Password?</a>
           </div>
           <button type="submit" className="btn" id="loginbtn">
             Log In

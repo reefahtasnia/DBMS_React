@@ -1,32 +1,37 @@
 import React, { useEffect, useState } from "react";
 import "./CSS/userprofile.css"; // Adjust the path as necessary
+import { FaShoppingCart } from "react-icons/fa"; 
 
 const UserProfile = () => {
   const auth = JSON.parse(localStorage.getItem("user"));
-  const [profileImage, setProfileImage] = useState("https://via.placeholder.com/150");
+  const [profileImage, setProfileImage] = useState(
+    "https://via.placeholder.com/150"
+  );
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [dob, setDob] = useState("");
   const [phone, setPhone] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
   const [address, setAddress] = useState("");
-
+  const capitalizeWords = (string) => {
+    return string.toLowerCase().replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+  };
   useEffect(() => {
     if (auth && auth.userId) {
       const url = `http://localhost:5000/api/user?userId=${auth.userId}`;
       fetch(url)
-        .then(response => {
+        .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP status ${response.status}`);
           }
           return response.json();
         })
-        .then(data => {
+        .then((data) => {
           console.log("Fetched user data:", data);
           localStorage.setItem("userdata", JSON.stringify(data));
           setProfileData(data);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("Failed to fetch user:", error.message);
           alert(`Failed to load user data: ${error.message}`);
         });
@@ -35,15 +40,15 @@ const UserProfile = () => {
 
   const setProfileData = (data) => {
     try {
-      setFullName(data[3] || "John Doe");
-      setEmail(data[4] || "johndoe@gmail.com");
-      setDob(data[5] ? new Date(data[5]).toISOString().slice(0, 10) : '');
-      setPhone(data[7] || '');
-      setBloodGroup(data[6] || '');
-      setAddress(data[8] || '');
+      setFullName(capitalizeWords(data[3] || "John Doe"));
+      setEmail(capitalizeWords(data[4] || "johndoe@gmail.com"));
+      setDob(data[5] ? new Date(data[5]).toISOString().slice(0, 10) : "");
+      setPhone(data[7] || "");
+      setBloodGroup(data[6] || "");
+      setAddress(capitalizeWords(data[8] || ""));
     } catch (error) {
       console.error("Error setting profile data:", error);
-      throw error; 
+      throw error;
     }
   };
 
@@ -60,7 +65,7 @@ const UserProfile = () => {
 
   const handleSave = (e) => {
     e.preventDefault();
-  
+
     const updatedUser = {
       userId: auth.userId,
       fullName,
@@ -70,9 +75,9 @@ const UserProfile = () => {
       bloodGroup,
       address,
     };
-  
+
     console.log("Saving updated user data:", updatedUser);
-  
+
     fetch(`http://localhost:5000/api/user/update`, {
       method: "POST",
       headers: {
@@ -80,13 +85,13 @@ const UserProfile = () => {
       },
       body: JSON.stringify(updatedUser),
     })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
-          throw new Error('Response not OK');
+          throw new Error("Response not OK");
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         console.log("Update response data:", data);
         if (data.success) {
           alert("Profile updated successfully");
@@ -94,12 +99,11 @@ const UserProfile = () => {
           alert(data.message);
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error:", error);
         alert("An error occurred during profile update");
       });
   };
-  
 
   return (
     <div className="profile-container">
@@ -143,6 +147,10 @@ const UserProfile = () => {
           <div className="profile-header-info">
             <h2 className="profile-name">{fullName || "John Doe"}</h2>
             <p className="profile-email">{email || "johndoe@gmail.com"}</p>
+            <button className="my-cart-button">
+              <FaShoppingCart className="cart-icon" />
+              My Cart
+            </button>
           </div>
         </div>
         <div className="profile-details">
@@ -193,15 +201,45 @@ const UserProfile = () => {
                 onChange={(e) => setBloodGroup(e.target.value)}
               />
             </div>
-            <div className="profile-detail profile-detail-full">
-              <label className="profile-detail-label">Address</label>
-              <textarea
+            
+            {/* <div className="profile-detail">
+              <label className="profile-detail-label">
+                House No. & Road No.
+              </label>
+              <input
+                type="text"
                 className="profile-detail-input"
-                rows="3"
-                value={address}
+                value={bloodGroup}
                 onChange={(e) => setAddress(e.target.value)}
               />
             </div>
+            <div className="profile-detail">
+              <label className="profile-detail-label">Area</label>
+              <input
+                type="text"
+                className="profile-detail-input"
+                value={bloodGroup}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div>
+            <div className="profile-detail">
+              <label className="profile-detail-label">District</label>
+              <input
+                type="text"
+                className="profile-detail-input"
+                value={bloodGroup}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div>
+            <div className="profile-detail">
+              <label className="profile-detail-label">Division</label>
+              <input
+                type="text"
+                className="profile-detail-input"
+                value={bloodGroup}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div> */}
           </div>
         </div>
         <div className="profile-section">
@@ -229,7 +267,12 @@ const UserProfile = () => {
           <button className="profile-action-button delete-button">
             Delete Account
           </button>
-          <button className="profile-action-button save-button" onClick={handleSave}>Save</button>
+          <button
+            className="profile-action-button save-button"
+            onClick={handleSave}
+          >
+            Save
+          </button>
         </div>
       </div>
     </div>
