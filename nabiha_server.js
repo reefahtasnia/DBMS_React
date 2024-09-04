@@ -266,10 +266,11 @@ app.delete("/medicine/:id", async (req, res) => {
 });
 
 app.post("/book-appointment", async (req, res) => {
-  const { email, date, time, day } = req.body;
+  const { email, date, time, day } = req.body; // Expect `date` in 'YYYY-MM-DD' and `time` in 'HH24:MI:SS' format
   let connection;
 
   try {
+    // Establish connection to the Oracle database
     connection = await oracledb.getConnection(dbConfig);
 
     // Fetch the BMDC number from the Doctors table using the provided email
@@ -279,24 +280,32 @@ app.post("/book-appointment", async (req, res) => {
     );
 
     if (doctorResult.rows.length === 0) {
-      res
-        .status(404)
-        .json({ message: "Doctor not found with the given email" });
+      res.status(404).json({ message: "Doctor not found with the given email" });
       return; // Stop further execution if no doctor is found
     }
 
     const bmdc = doctorResult.rows[0][0]; // Assuming BMDC is the first column
 
+    // Combine `date` and `time` into a single `TIMESTAMP` for `appointment_timestamp`
+    const appointmentTimestamp = `${date} ${time}`; // Combine date and time into 'YYYY-MM-DD HH24:MI:SS' format
+
     // Insert the new appointment into the Appointment table
     const sql = `
-          INSERT INTO Appointment (appointment_id, BMDC_no, date, time, day)
-          VALUES (appointment_seq.nextval, :bmdc, TO_DATE(:date, 'YYYY-MM-DD'), :time, :day)
-      `;
+      INSERT INTO Appointment (appointment_id, BMDC, appointment_timestamp, day_of_week)
+      VALUES (appointment_seq.nextval, :bmdc, TO_TIMESTAMP(:appointment_timestamp, 'YYYY-MM-DD HH24:MI:SS'), :day_of_week)
+    `;
+
+    // Execute the query with correct bind variables
     await connection.execute(
       sql,
-      { bmdc, date, time, day },
-      { autoCommit: true }
+      {
+        bmdc: bmdc,
+        appointment_timestamp: appointmentTimestamp,  // Correctly formatted TIMESTAMP input
+        day_of_week: day,                             // Day of the week
+      },
+      { autoCommit: true }  // Commit the transaction
     );
+
     res.status(201).json({ message: "Appointment booked successfully" });
   } catch (error) {
     console.error("Error booking appointment:", error);
@@ -311,6 +320,7 @@ app.post("/book-appointment", async (req, res) => {
     }
   }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
