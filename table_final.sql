@@ -64,14 +64,34 @@ CREATE TABLE Medical_History (
     treatment VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
-CREATE TABLE Medicine (
+// Medicine Tracker er shob 
+create table medicine (
+medicine_code int,
+medicine_name varchar2(100)
+);
+
+CREATE TABLE Medicinetracker (
     medicine_code INT PRIMARY KEY,
     user_id INT,
+    id NUMBER NOT NULL,
     name VARCHAR(255),
     dosage INT,
     time TIME,
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
+CREATE SEQUENCE medicine_seq
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+CREATE OR REPLACE TRIGGER medicine_trigger
+BEFORE INSERT ON medicinetracker
+FOR EACH ROW
+BEGIN
+    SELECT medicine_seq.NEXTVAL INTO :new.id FROM dual;
+END;
+//
 CREATE TABLE Appointment (
     appointment_id INT PRIMARY KEY,
     BMDC_no INT,
