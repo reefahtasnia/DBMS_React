@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import bcrypt from "bcrypt";
 import { connection, run_query } from "./connection.js";
-import { sendEmail } from './sendEmail.js';
+import { sendEmail } from "./sendEmail.js";
 import oracledb from "oracledb";
 
 dotenv.config();
@@ -25,7 +25,7 @@ app.get("/api", (req, res) => {
 });
 
 app.post("/api/signup", async (req, res) => {
-  const { firstname, lastname, email, password, dob } = req.body;
+  let { firstname, lastname, email, password, dob } = req.body;
 
   // Debug logs
   console.log("Received signup request with data:", req.body);
@@ -34,7 +34,8 @@ app.post("/api/signup", async (req, res) => {
   try {
     // Open a new connection
     conn = await connection();
-
+    console.log("Connection established successfully", conn);
+    email=email.toUpperCase();
     // Check if user already exists
     const checkUserQuery = "SELECT * FROM Users WHERE email = :email";
     const result = await conn.execute(checkUserQuery, [email], {
@@ -173,7 +174,7 @@ app.get("/api/user", async (req, res) => {
     }
     const data = userResults[0];
     console.log(data);
-    res.json(data); // Ensure you are sending the correct part of the
+    res.json(data);
     console.log(res.json.data);
   } catch (error) {
     console.error("Error fetching user:", error);
@@ -184,23 +185,41 @@ app.get("/api/user", async (req, res) => {
 });
 
 app.post("/api/user/update", async (req, res) => {
-  const { userId, fullName, email, dob, phone, bloodGroup, address } = req.body;
+  const {
+    userId,
+    firstname,
+    lastname,
+    email,
+    dob,
+    phone,
+    bloodGroup,
+    street,
+    region,
+    district,
+    country,
+  } = req.body;
 
-  const [firstname, lastname] = fullName.split(" ");
-
-  let formattedDob;
-  try {
-    formattedDob = new Date(dob).toISOString().slice(0, 10);
-  } catch (error) {
-    console.error("Invalid date format for dob:", dob);
-    return res
-      .status(400)
-      .json({ message: "Invalid date format for date of birth" });
+  if (!firstname || !lastname) {
+    console.log("First name and last name are required.");
+    return res.status(400).json({ message: "First name and last name are required." });
   }
 
+  let formattedDob = new Date(dob).toISOString().slice(0, 10);
+  
   let conn;
   try {
     conn = await connection();
+    
+    // Convert the address JS object to Oracle UDT
+    const addressObj = {
+      type: "ADDRESS_TYPE", // This should match the Oracle UDT name
+      val: {
+        STREET: street,
+        REGION: region,
+        DISTRICT: district,
+        COUNTRY: country
+      }
+    };
 
     const updateQuery = `
       UPDATE Users
@@ -211,7 +230,7 @@ app.post("/api/user/update", async (req, res) => {
         date_of_birth = TO_DATE(:dob, 'YYYY-MM-DD'),
         phone_number = :phone,
         blood_group = :bloodGroup,
-        address = :address
+        address = :addressObj
       WHERE userid = :userId
     `;
 
@@ -223,28 +242,21 @@ app.post("/api/user/update", async (req, res) => {
       dob: formattedDob,
       phone,
       bloodGroup,
-      address,
+      addressObj
     };
 
     console.log("Update query parameters:", params);
-
-    const result = await conn.execute(updateQuery, params, {
-      autoCommit: true,
-    });
+    const result = await conn.execute(updateQuery, params, { autoCommit: true });
 
     console.log("Update result:", result);
-
-    // Check if any rows were affected
     if (!result || result.rowsAffected === 0) {
-      return res
-        .status(404)
-        .json({ message: "User not found or no changes made" });
+      return res.status(404).json({ message: "User not found or no changes made" });
     }
 
     res.status(200).json({ message: "Profile updated successfully" });
   } catch (error) {
     console.error("Error during profile update:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error", error: error.toString() });
   } finally {
     if (conn) {
       try {
@@ -291,7 +303,7 @@ app.post("/api/doctorSignup", async (req, res) => {
     `;
 
     const bindVars = {
-      BMDC: regno, 
+      BMDC: regno,
       fullname,
       email,
       gender,
@@ -306,18 +318,21 @@ app.post("/api/doctorSignup", async (req, res) => {
     await conn.execute(insertQuery, bindVars, { autoCommit: true });
 
     const hash = await bcrypt.hash(password, saltRounds);
-    console.log(hash,req.body.BMDC);
-    const insertPasswordQuery = "INSERT INTO Passwords (BMDC, hashed_password) VALUES (:BMDC, :hashedPassword)";
+    console.log(hash, req.body.BMDC);
+    const insertPasswordQuery =
+      "INSERT INTO Passwords (BMDC, hashed_password) VALUES (:BMDC, :hashedPassword)";
     await conn.execute(
       insertPasswordQuery,
-      { BMDC:regno, hashedPassword: hash },
+      { BMDC: regno, hashedPassword: hash },
       { autoCommit: true }
     );
-    
+
     res.status(201).json({ message: "Doctor registered successfully" });
   } catch (error) {
     console.error("Error during doctor signup:", error);
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   } finally {
     if (conn) {
       try {
@@ -338,13 +353,13 @@ app.post("/api/doctorLogin", async (req, res) => {
       { email }
     );
 
-    console.log("Doctor Results:", doctorResults);  // Log the results for debugging
+    console.log("Doctor Results:", doctorResults); // Log the results for debugging
 
     if (doctorResults.length === 0) {
       return res.status(404).json({ message: "Doctor not found" });
     }
 
-    const bmdc = doctorResults[0][0];  // Assuming BMDC is the first element in the array
+    const bmdc = doctorResults[0][0]; // Assuming BMDC is the first element in the array
     console.log("BMDC:", bmdc);
 
     const passwordResults = await run_query(
@@ -352,13 +367,15 @@ app.post("/api/doctorLogin", async (req, res) => {
       { bmdc }
     );
 
-    console.log("Password Results:", passwordResults);  // Log the results for debugging
+    console.log("Password Results:", passwordResults); // Log the results for debugging
 
     if (passwordResults.length === 0 || !passwordResults[0][0]) {
-      return res.status(404).json({ message: "Password not set for this doctor" });
+      return res
+        .status(404)
+        .json({ message: "Password not set for this doctor" });
     }
 
-    const hashed_password = passwordResults[0][0]; 
+    const hashed_password = passwordResults[0][0];
     console.log("Hashed Password:", hashed_password);
 
     const match = await bcrypt.compare(password, hashed_password);
@@ -366,14 +383,16 @@ app.post("/api/doctorLogin", async (req, res) => {
     if (match) {
       res.status(200).json({
         message: "Login successful",
-        BMDC: bmdc,  
+        BMDC: bmdc,
       });
     } else {
       res.status(401).json({ message: "Incorrect password" });
     }
   } catch (error) {
     console.error("Error during doctor login process:", error);
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 });
 
@@ -397,13 +416,16 @@ app.get("/api/doctoruser", async (req, res) => {
     console.log("Doctor data retrieved:", doctor);
     res.json(doctor);
   } catch (error) {
-    console.error('Error fetching doctor data:', error);
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    console.error("Error fetching doctor data:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 });
 
 app.post("/api/doctor/update", async (req, res) => {
-  const { BMDC, fullname, email, phone, dept, mbbsYear, hosp, chamber } = req.body;
+  const { BMDC, fullname, email, phone, dept, mbbsYear, hosp, chamber } =
+    req.body;
 
   let conn;
   try {
@@ -429,13 +451,17 @@ app.post("/api/doctor/update", async (req, res) => {
       dept,
       mbbsYear,
       hosp,
-      chamber
+      chamber,
     };
 
-    const result = await conn.execute(updateQuery, params, { autoCommit: true });
+    const result = await conn.execute(updateQuery, params, {
+      autoCommit: true,
+    });
 
     if (result.rowsAffected === 0) {
-      return res.status(404).json({ message: "Doctor not found or no updates made" });
+      return res
+        .status(404)
+        .json({ message: "Doctor not found or no updates made" });
     }
 
     res.status(200).json({ message: "Doctor profile updated successfully" });
@@ -453,7 +479,7 @@ app.post("/api/doctor/update", async (req, res) => {
   }
 });
 
-app.post('/api/send-otp', async (req, res) => {
+app.post("/api/send-otp", async (req, res) => {
   const { email } = req.body;
   if (!email) {
     return res.status(400).json({ message: "Email is required" });
@@ -470,8 +496,10 @@ app.post('/api/send-otp', async (req, res) => {
 
     if (result.rows.length > 0) {
       const { USERID } = result.rows[0];
-      const otp = await sendEmail(email, 'Your OTP for Maternity Maven');
-      return res.status(200).json({ message: "OTP sent to your email", otp, userId: USERID });
+      const otp = await sendEmail(email, "Your OTP for Maternity Maven");
+      return res
+        .status(200)
+        .json({ message: "OTP sent to your email", otp, userId: USERID });
     }
 
     // If not found in Users, check the Doctors table
@@ -483,15 +511,19 @@ app.post('/api/send-otp', async (req, res) => {
 
     if (result.rows.length > 0) {
       const { BMDC } = result.rows[0];
-      const otp = await sendEmail(email, 'Your OTP for Maternity Maven');
-      return res.status(200).json({ message: "OTP sent to your email", otp, bmdc: BMDC });
+      const otp = await sendEmail(email, "Your OTP for Maternity Maven");
+      return res
+        .status(200)
+        .json({ message: "OTP sent to your email", otp, bmdc: BMDC });
     }
 
     // If not found in either table
     return res.status(404).json({ message: "User or Doctor not found" });
   } catch (error) {
-    console.error('Error when checking user or sending email:', error);
-    res.status(500).json({ error: "Internal server error", error: error.toString() });
+    console.error("Error when checking user or sending email:", error);
+    res
+      .status(500)
+      .json({ error: "Internal server error", error: error.toString() });
   } finally {
     if (conn) {
       try {
@@ -503,12 +535,14 @@ app.post('/api/send-otp', async (req, res) => {
   }
 });
 
-app.post('/api/reset-password', async (req, res) => {
+app.post("/api/reset-password", async (req, res) => {
   const { password, userId, bmdc } = req.body;
   const saltRounds = 10;
 
   if (!password || (!userId && !bmdc)) {
-    return res.status(400).json({ message: 'Password and either User ID or BMDC are required' });
+    return res
+      .status(400)
+      .json({ message: "Password and either User ID or BMDC are required" });
   }
 
   try {
@@ -516,7 +550,8 @@ app.post('/api/reset-password', async (req, res) => {
     let selectParams;
     console.log(userId);
     if (userId) {
-      selectQuery = "SELECT hashed_password FROM Passwords WHERE userid = :userId";
+      selectQuery =
+        "SELECT hashed_password FROM Passwords WHERE userid = :userId";
       selectParams = { userId };
     } else if (bmdc) {
       selectQuery = "SELECT hashed_password FROM Passwords WHERE BMDC = :bmdc";
@@ -524,11 +559,12 @@ app.post('/api/reset-password', async (req, res) => {
     }
 
     const currentPasswordResult = await run_query(selectQuery, selectParams);
-    const currentPassword = currentPasswordResult.length > 0 ? currentPasswordResult[0][0] : null;
+    const currentPassword =
+      currentPasswordResult.length > 0 ? currentPasswordResult[0][0] : null;
     console.log(currentPasswordResult);
     console.log(currentPassword);
     if (!currentPassword) {
-      return res.status(404).json({ message: 'User or Doctor not found' });
+      return res.status(404).json({ message: "User or Doctor not found" });
     }
 
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -537,28 +573,32 @@ app.post('/api/reset-password', async (req, res) => {
     let updateParams;
 
     if (userId) {
-      updateQuery = "UPDATE Passwords SET hashed_password = :hashedPassword WHERE userid = :userId";
+      updateQuery =
+        "UPDATE Passwords SET hashed_password = :hashedPassword WHERE userid = :userId";
       updateParams = { hashedPassword, userId };
     } else if (bmdc) {
-      updateQuery = "UPDATE Passwords SET hashed_password = :hashedPassword WHERE BMDC = :bmdc";
+      updateQuery =
+        "UPDATE Passwords SET hashed_password = :hashedPassword WHERE BMDC = :bmdc";
       updateParams = { hashedPassword, bmdc };
     }
 
     await run_query(updateQuery, updateParams);
 
     const updatedPasswordResult = await run_query(selectQuery, selectParams);
-    const updatedPassword = updatedPasswordResult.length > 0 ? updatedPasswordResult[0].HASHED_PASSWORD : null;
+    const updatedPassword =
+      updatedPasswordResult.length > 0
+        ? updatedPasswordResult[0].HASHED_PASSWORD
+        : null;
 
     if (currentPassword === updatedPassword) {
-      return res.status(500).json({ message: 'Password update failed, please try again.' });
+      return res
+        .status(500)
+        .json({ message: "Password update failed, please try again." });
     }
 
-    res.status(200).json({ message: 'Password reset successfully' });
+    res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
-    console.error('Error during password reset:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error during password reset:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
-
-
-

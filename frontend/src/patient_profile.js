@@ -12,7 +12,10 @@ const UserProfile = () => {
   const [dob, setDob] = useState("");
   const [phone, setPhone] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
-  const [address, setAddress] = useState("");
+  const [street, setStreet] = useState("");
+  const [region, setRegion] = useState("");
+  const [district, setDistrict] = useState("");
+  const [country, setCountry] = useState("");
   const capitalizeWords = (string) => {
     return string.toLowerCase().replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
   };
@@ -40,17 +43,27 @@ const UserProfile = () => {
 
   const setProfileData = (data) => {
     try {
-      setFullName(capitalizeWords(data[3] || "John Doe"));
-      setEmail(capitalizeWords(data[4] || "johndoe@gmail.com"));
+            const address = data[8];
+  
+      setFullName(capitalizeWords(`${data[1]} ${data[2]}`)); 
+      setEmail(data[4].toLowerCase());
       setDob(data[5] ? new Date(data[5]).toISOString().slice(0, 10) : "");
       setPhone(data[7] || "");
       setBloodGroup(data[6] || "");
-      setAddress(capitalizeWords(data[8] || ""));
+  
+      // Check if the address exists and set each part
+      if (address) {
+        setStreet(capitalizeWords(address.STREET || ""));
+        setRegion(capitalizeWords(address.REGION || ""));
+        setDistrict(capitalizeWords(address.DISTRICT || ""));
+        setCountry(capitalizeWords(address.COUNTRY || ""));
+      }
     } catch (error) {
       console.error("Error setting profile data:", error);
       throw error;
     }
   };
+  
 
   const triggerFileInput = () => {
     document.getElementById("fileInput").click();
@@ -65,19 +78,27 @@ const UserProfile = () => {
 
   const handleSave = (e) => {
     e.preventDefault();
-
+  
+    const nameParts = fullName.trim().split(" ");
+    const firstname = nameParts[0];
+    const lastname = nameParts.slice(1).join(" "); 
+  
     const updatedUser = {
       userId: auth.userId,
-      fullName,
+      firstname, 
+      lastname,   
       email,
       dob,
       phone,
       bloodGroup,
-      address,
+      street,
+      region,
+      district,
+      country
     };
-
+  
     console.log("Saving updated user data:", updatedUser);
-
+  
     fetch(`http://localhost:5000/api/user/update`, {
       method: "POST",
       headers: {
@@ -104,7 +125,7 @@ const UserProfile = () => {
         alert("An error occurred during profile update");
       });
   };
-
+  
   return (
     <div className="profile-container">
       <div className="profile-content">
@@ -202,15 +223,15 @@ const UserProfile = () => {
               />
             </div>
             
-            {/* <div className="profile-detail">
+            <div className="profile-detail">
               <label className="profile-detail-label">
                 House No. & Road No.
               </label>
               <input
                 type="text"
                 className="profile-detail-input"
-                value={bloodGroup}
-                onChange={(e) => setAddress(e.target.value)}
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
               />
             </div>
             <div className="profile-detail">
@@ -218,8 +239,8 @@ const UserProfile = () => {
               <input
                 type="text"
                 className="profile-detail-input"
-                value={bloodGroup}
-                onChange={(e) => setAddress(e.target.value)}
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
               />
             </div>
             <div className="profile-detail">
@@ -227,19 +248,33 @@ const UserProfile = () => {
               <input
                 type="text"
                 className="profile-detail-input"
-                value={bloodGroup}
-                onChange={(e) => setAddress(e.target.value)}
+                value={district}
+                onChange={(e) => setDistrict(e.target.value)}
               />
             </div>
             <div className="profile-detail">
-              <label className="profile-detail-label">Division</label>
+              <label className="profile-detail-label">Country</label>
               <input
                 type="text"
                 className="profile-detail-input"
-                value={bloodGroup}
-                onChange={(e) => setAddress(e.target.value)}
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
               />
-            </div> */}
+            </div> 
+          </div>
+        </div>
+        <div className="profile-section">
+          <h3 className="profile-section-title">Medicine Reminders</h3>
+          <button className="profile-section-button">Edit</button>
+          <div className="profile-section-content">
+            <p>No upcoming reminders.</p>
+          </div>
+        </div>
+        <div className="profile-section">
+          <h3 className="profile-section-title">Calories Intake</h3>
+          <button className="profile-section-button">Edit</button>
+          <div className="profile-section-content">
+            <p>No data entered.</p>
           </div>
         </div>
         <div className="profile-section">
@@ -252,13 +287,6 @@ const UserProfile = () => {
         <div className="profile-section">
           <h3 className="profile-section-title">Upcoming Appointments</h3>
           <button className="profile-section-button">Add</button>
-          <div className="profile-section-content">
-            <p>No upcoming appointments.</p>
-          </div>
-        </div>
-        <div className="profile-section">
-          <h3 className="profile-section-title">Medicine Reminders</h3>
-          <button className="profile-section-button">Edit</button>
           <div className="profile-section-content">
             <p>No upcoming appointments.</p>
           </div>
