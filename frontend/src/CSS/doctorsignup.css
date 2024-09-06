@@ -3,12 +3,13 @@
   margin: 0;
   box-sizing: border-box;
 }
+/*
 body {
   background-image: url("assets/10508261.jpg");
   background-size: cover;
   background-repeat: no-repeat;
   min-height: 100vh;
-}
+}*/
 .navbar {
   background: linear-gradient(45deg, #ffefd4, #f5918b);
   padding: 1rem 0;
