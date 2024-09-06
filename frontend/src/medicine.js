@@ -3,25 +3,43 @@ import "./medicine.css";
 
 const MedicineTracker = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Safe parsing of the 'user' object from localStorage
+  const getUserFromLocalStorage = () => {
+    const userString = localStorage.getItem("user");
+    try {
+      return userString ? JSON.parse(userString) : null;
+    } catch (error) {
+      console.error("Failed to parse user from local storage:", error);
+      return null;
+    }
+  };
+
+  const auth = getUserFromLocalStorage();
+  const userId = auth ? auth.userId : null;
+  console.log("Retrieved userId:", userId); // Debug log the userId
+
   const [medicines, setMedicines] = useState([
     { name: "", dosage: "", time: "" },
   ]);
+
   const [submitted, setSubmitted] = useState(false);
   const [medicineOptions, setMedicineOptions] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
-  const [prescriptions, setPrescriptions] = useState([]); // State to hold all submitted prescriptions
-  const [editIndex, setEditIndex] = useState(null); // Track the index of the prescription being edited
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [editIndex, setEditIndex] = useState(null);
 
   useEffect(() => {
+    console.log("UseEffect retrieved userId:", userId);
     populateMedicines();
-  }, []);
+  }, [userId]);
 
   const populateMedicines = async () => {
     try {
-      const response = await fetch("http://localhost:3000/medicine-options"); // Assuming this endpoint exists for fetching options
+      const response = await fetch("http://localhost:3000/medicine-options");
       const data = await response.json();
       setMedicineOptions(data);
-      console.log(data);
+      console.log("Medicine options fetched:", data);
     } catch (error) {
       console.log("Error fetching data:", error);
     }
@@ -38,8 +56,8 @@ const MedicineTracker = () => {
     if (name === "name") {
       const query = value.toLowerCase();
       if (query.length > 0) {
-        const filteredSuggestions = medicineOptions.filter(
-          (option) => option.name && option.name.toLowerCase().includes(query)
+        const filteredSuggestions = medicineOptions.filter((option) =>
+          option.name.toLowerCase().includes(query)
         );
         setSuggestions(filteredSuggestions);
       } else {
@@ -49,7 +67,10 @@ const MedicineTracker = () => {
   };
 
   const handleAddMedicine = () => {
-    setMedicines([...medicines, { name: "", dosage: "", time: "" }]);
+    setMedicines([
+      ...medicines,
+      { name: "", dosage: "", time: "", userid: userId },
+    ]);
   };
 
   const handleRemoveMedicine = (index) => {
@@ -59,34 +80,27 @@ const MedicineTracker = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(medicines);
+    const payload = {
+      userId: userId,
+      medicines: medicines,
+    };
+    console.log(payload);
 
     try {
-      const responsePost = await fetch("http://localhost:3000/medicine", {
+      const responsePost = await fetch("http://localhost:5000/medicine", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(medicines), // Sending the medicines array to the backend
+        body: JSON.stringify(payload),
       });
 
       if (responsePost.ok) {
-        const data = await responsePost.json(); // Parse the response as JSON
-        console.log("Received data:", data); // Log the received data to check structure
-
-        // Map the returned data to include the id, name, dosage, and time
-        const prescriptionsWithId = data.map((item) => ({
-          id: item.id, // Ensure `id` is correctly mapped from the backend response
-          name: item.name,
-          dosage: item.dosage,
-          time: item.time,
-        }));
-
-        // Update the prescriptions state with the new data
-        setPrescriptions([...prescriptions, ...prescriptionsWithId]);
+        const data = await responsePost.json();
+        setPrescriptions([...prescriptions, ...data]);
         setSubmitted(true);
-        clearForm(); // Function to clear the form inputs after submission
-        setIsModalOpen(false); // Close the modal after successful submission
+        clearForm();
+        setIsModalOpen(false);
       } else {
         alert("Error submitting data.");
       }
@@ -102,25 +116,27 @@ const MedicineTracker = () => {
 
   const removePrescription = async (index) => {
     const prescription = prescriptions[index];
-    console.log(prescription.id);
+    console.log("Deleting prescription with ID:", prescription.id);
     if (prescription) {
       try {
         const response = await fetch(
-          `http://localhost:3000/medicine/${prescription.id}`,
+          `http://localhost:5000/medicine/${prescription.id}`,
           {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
             },
+            body: JSON.stringify({ userId }),
           }
         );
+
         if (response.ok) {
           const updatedPrescriptions = prescriptions.filter(
             (_, i) => i !== index
           );
           setPrescriptions(updatedPrescriptions);
         } else {
-          alert("Failed to delete the prescription");
+          alert("Failed to delete the prescription.");
         }
       } catch (error) {
         console.error("Error deleting prescription:", error);
@@ -132,33 +148,34 @@ const MedicineTracker = () => {
 
   const editPrescription = async (index) => {
     const prescription = prescriptions[index];
-    setEditIndex(index); // Set the editIndex to the current prescription index
+    setEditIndex(index);
     setMedicines([
       {
         name: prescription.name,
         dosage: prescription.dosage,
         time: prescription.time,
+        userid: userId, // Ensure userId is passed in case it's not in the original
       },
     ]);
-    setIsModalOpen(true); // Open the modal with the prescription data
+    setIsModalOpen(true);
   };
 
   const handleEditSubmit = async (event) => {
     event.preventDefault();
     if (editIndex === null) return;
 
-    const prescription = medicines[0]; // Get the updated medicine data
-    const prescriptionId = prescriptions[editIndex].id; // Get the ID of the prescription being edited
+    const prescription = { ...medicines[0], userId }; // Include userId in the payload
+    const prescriptionId = prescriptions[editIndex].id;
 
     try {
       const response = await fetch(
-        `http://localhost:3000/medicine/${prescriptionId}`,
+        `http://localhost:5000/medicine/${prescriptionId}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(prescription), // Send the updated prescription data
+          body: JSON.stringify(prescription),
         }
       );
 
@@ -166,10 +183,10 @@ const MedicineTracker = () => {
         const updatedPrescriptions = prescriptions.map((item, i) =>
           i === editIndex ? { ...item, ...prescription } : item
         );
-        setPrescriptions(updatedPrescriptions); // Update the prescriptions list
+        setPrescriptions(updatedPrescriptions);
         clearForm();
         setIsModalOpen(false);
-        setEditIndex(null); // Reset the editIndex
+        setEditIndex(null);
       } else {
         alert("Failed to update the prescription.");
       }

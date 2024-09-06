@@ -35,7 +35,7 @@ app.post("/api/signup", async (req, res) => {
     // Open a new connection
     conn = await connection();
     console.log("Connection established successfully", conn);
-    email=email.toUpperCase();
+    email = email.toUpperCase();
     // Check if user already exists
     const checkUserQuery = "SELECT * FROM Users WHERE email = :email";
     const result = await conn.execute(checkUserQuery, [email], {
@@ -201,15 +201,17 @@ app.post("/api/user/update", async (req, res) => {
 
   if (!firstname || !lastname) {
     console.log("First name and last name are required.");
-    return res.status(400).json({ message: "First name and last name are required." });
+    return res
+      .status(400)
+      .json({ message: "First name and last name are required." });
   }
 
   let formattedDob = new Date(dob).toISOString().slice(0, 10);
-  
+
   let conn;
   try {
     conn = await connection();
-    
+
     // Convert the address JS object to Oracle UDT
     const addressObj = {
       type: "ADDRESS_TYPE", // This should match the Oracle UDT name
@@ -217,8 +219,8 @@ app.post("/api/user/update", async (req, res) => {
         STREET: street,
         REGION: region,
         DISTRICT: district,
-        COUNTRY: country
-      }
+        COUNTRY: country,
+      },
     };
 
     const updateQuery = `
@@ -242,21 +244,27 @@ app.post("/api/user/update", async (req, res) => {
       dob: formattedDob,
       phone,
       bloodGroup,
-      addressObj
+      addressObj,
     };
 
     console.log("Update query parameters:", params);
-    const result = await conn.execute(updateQuery, params, { autoCommit: true });
+    const result = await conn.execute(updateQuery, params, {
+      autoCommit: true,
+    });
 
     console.log("Update result:", result);
     if (!result || result.rowsAffected === 0) {
-      return res.status(404).json({ message: "User not found or no changes made" });
+      return res
+        .status(404)
+        .json({ message: "User not found or no changes made" });
     }
 
     res.status(200).json({ message: "Profile updated successfully" });
   } catch (error) {
     console.error("Error during profile update:", error);
-    res.status(500).json({ message: "Internal server error", error: error.toString() });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.toString() });
   } finally {
     if (conn) {
       try {
@@ -600,5 +608,213 @@ app.post("/api/reset-password", async (req, res) => {
   } catch (error) {
     console.error("Error during password reset:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+});
+app.post("/medicine", async (req, res) => {
+  console.log("Received request body:", req.body); // Log the incoming request body
+
+  const { medicines, userId } = req.body; // Extract medicines and userId from the request body
+
+  // Validate input
+  if (!Array.isArray(medicines) || medicines.length === 0) {
+    console.error("Medicines is not a valid array or is empty:", medicines);
+    return res
+      .status(400)
+      .json({ message: "Invalid or missing 'medicines' array." });
+  }
+
+  if (!userId) {
+    console.error("Missing userId in request body");
+    return res
+      .status(400)
+      .json({ message: "Missing 'userId' in request body." });
+  }
+
+  let conn;
+  try {
+    conn = await connection(); // Establish database connection
+    const addedMedicines = [];
+
+    for (const medicine of medicines) {
+      console.log(`Processing medicine: ${medicine.name}`); // Debugging
+
+      // Fetch the medicine_code for the given medicine name
+      const queryMedicineCode = `SELECT medicine_code FROM medicine WHERE medicine_name = :name`;
+      const medicineCodeResult = await run_query(queryMedicineCode, {
+        name: medicine.name,
+      });
+
+      if (medicineCodeResult.length === 0) {
+        console.log(`No medicine code found for ${medicine.name}`);
+        continue; // Skip this iteration if no medicine code is found
+      }
+
+      const medicineCode = medicineCodeResult[0][0]; // Assuming medicine_code is the first column
+
+      // Insert into medicinetracker with the fetched medicine_code and user_id
+      const insertQuery = `
+        INSERT INTO medicinetracker (medicine_code, user_id, name, dosage, time)
+        VALUES (:medicine_code, :user_id, :name, :dosage, :time)
+        RETURNING id INTO :id`;
+
+      const result = await conn.execute(
+        insertQuery,
+        {
+          medicine_code: medicineCode,
+          user_id: userId,
+          name: medicine.name,
+          dosage: medicine.dosage,
+          time: medicine.time,
+          id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
+        },
+        { autoCommit: false }
+      ); // Auto commit is turned off to manage transactions manually
+
+      const newId = result.outBinds.id[0];
+      addedMedicines.push({
+        id: newId,
+        medicine_code: medicineCode,
+        user_id: userId,
+        name: medicine.name,
+        dosage: medicine.dosage,
+        time: medicine.time,
+      });
+    }
+
+    await conn.commit(); // Commit the transaction after all insertions are done
+
+    res.status(201).json(addedMedicines);
+  } catch (error) {
+    if (conn) {
+      await conn.rollback(); // Rollback the transaction in case of an error
+    }
+    console.error("Error during medicine insertion:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  } finally {
+    if (conn) {
+      try {
+        await conn.close();
+      } catch (error) {
+        console.error("Error closing connection:", error);
+      }
+    }
+  }
+});
+
+app.put("/medicine/:id", async (req, res) => {
+  const prescriptionId = req.params.id; // ID of the prescription to update
+  const { name, dosage, time, userId } = req.body; // Extract userId from the request body
+  console.log("Received request to update prescription:", req.body); // Debugging
+
+  // Validate input
+  if (!userId) {
+    console.error("Missing userId in request body");
+    return res
+      .status(400)
+      .json({ message: "Missing 'userId' in request body." });
+  }
+
+  let conn;
+  try {
+    conn = await connection(); // Establish database connection
+
+    // Update prescription only if it matches the id and user_id
+    const updateQuery = `
+      UPDATE medicinetracker 
+      SET name = :name, dosage = :dosage, time = :time 
+      WHERE id = :id AND user_id = :userId`;
+
+    const result = await conn.execute(
+      updateQuery,
+      { id: prescriptionId, name, dosage, time, userId },
+      { autoCommit: false } // Turn off auto commit to manage transactions manually
+    );
+
+    if (result.rowsAffected === 0) {
+      console.log("Prescription not found or not authorized for update");
+      return res
+        .status(404)
+        .json({ message: "Prescription not found or not authorized" });
+    }
+
+    await conn.commit(); // Commit the transaction after the update is done
+    console.log("Updated prescription:", req.body); // Debugging
+    res.status(200).json({ message: "Prescription updated successfully" });
+  } catch (error) {
+    if (conn) {
+      await conn.rollback(); // Rollback the transaction in case of an error
+    }
+    console.error("Error during updating prescription:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  } finally {
+    if (conn) {
+      try {
+        await conn.close(); // Close the connection
+      } catch (err) {
+        console.error("Error closing the connection:", err);
+      }
+    }
+  }
+});
+app.delete("/medicine/:id", async (req, res) => {
+  const { id } = req.params; // ID of the prescription to delete
+  const { userId } = req.body; // Extract userId from the request body
+  console.log(
+    `Received request to delete prescription with ID: ${id}, for user: ${userId}`
+  ); // Debugging
+
+  // Validate input
+  if (!userId) {
+    console.error("Missing userId in request body");
+    return res
+      .status(400)
+      .json({ message: "Missing 'userId' in request body." });
+  }
+
+  let conn;
+  try {
+    conn = await connection(); // Establish database connection
+
+    // Delete prescription only if it matches the id and user_id
+    const deleteQuery = `
+      DELETE FROM medicinetracker 
+      WHERE id = :id AND user_id = :userId`;
+
+    const result = await conn.execute(
+      deleteQuery,
+      { id, userId },
+      { autoCommit: false } // Turn off auto commit to manage transactions manually
+    );
+
+    if (result.rowsAffected === 0) {
+      console.log("Prescription not found or not authorized for deletion");
+      return res
+        .status(404)
+        .json({ message: "Prescription not found or not authorized" });
+    }
+
+    await conn.commit(); // Commit the transaction after the deletion is done
+    console.log(`Deleted prescription with ID: ${id}`); // Debugging
+    res.status(200).json({ message: "Medicine deleted successfully" });
+  } catch (error) {
+    if (conn) {
+      await conn.rollback(); // Rollback the transaction in case of an error
+    }
+    console.error("Error deleting medicine:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  } finally {
+    if (conn) {
+      try {
+        await conn.close(); // Close the connection
+      } catch (error) {
+        console.error("Error closing connection:", error);
+      }
+    }
   }
 });
