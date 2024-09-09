@@ -4,17 +4,17 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/medical.css';
 
 const Medical = () => {
-  const initialRow = { year: '', incident: '', treatment: '' };
-  const initialRows = Array(3).fill().map(() => ({ ...initialRow }));
-  const [medicalHistory, setMedicalHistory] = useState(initialRows);
+  const auth = JSON.parse(localStorage.getItem("user"));
+  const initialRow = { year: '', incident: '', treatment: '', userid: auth.userId };
+  const [medicalHistory, setMedicalHistory] = useState([initialRow]);
   const [viewHistory, setViewHistory] = useState(false);
   const [fullHistory, setFullHistory] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [operationCount, setOperationCount] = useState(0);
 
   useEffect(() => {
-    setMedicalHistory(initialRows);
     fetchOperationCount();
+    fetchFullHistory();
   }, []);
 
   const fetchOperationCount = async () => {
@@ -28,8 +28,7 @@ const Medical = () => {
 
   const fetchFullHistory = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/medical-history');
-      console.log('Fetched full history:', response.data);  // Debugging output
+      const response = await axios.get(`http://localhost:5000/api/medical-history?userid=${auth.userId}`);
       setFullHistory(response.data);
       setViewHistory(true);
     } catch (error) {
@@ -58,7 +57,7 @@ const Medical = () => {
     if (filledRows.length > 0) {
       try {
         await axios.post('http://localhost:5000/api/medical-history', filledRows);
-        setMedicalHistory(initialRows);
+        setMedicalHistory([initialRow]);
         fetchOperationCount(); // Refresh operation count after save
       } catch (error) {
         console.error('Error saving medical history', error);
@@ -70,12 +69,11 @@ const Medical = () => {
 
   const handleDelete = async () => {
     const rowsToDelete = selectedRows.map(index => ({
-      year: fullHistory[index][0],
-      incident: fullHistory[index][1],
-      treatment: fullHistory[index][2]
+      userid: fullHistory[index][0],
+      year: fullHistory[index][1],
+      incident: fullHistory[index][2],
+      treatment: fullHistory[index][3]
     }));
-
-    console.log('Rows to delete:', rowsToDelete); // Debugging output
 
     try {
       await axios.post('http://localhost:5000/api/medical-history/delete', { rows: rowsToDelete });
@@ -88,13 +86,11 @@ const Medical = () => {
   };
 
   const toggleRowSelection = (index) => {
-    console.log('Toggling row:', index); // Debugging output
     if (selectedRows.includes(index)) {
       setSelectedRows(selectedRows.filter(i => i !== index));
     } else {
       setSelectedRows([...selectedRows, index]);
     }
-    console.log('Selected rows:', selectedRows); // Debugging output
   };
 
   const currentYear = new Date().getFullYear();
@@ -102,6 +98,7 @@ const Medical = () => {
   for (let year = currentYear; year >= 1900; year--) {
     yearOptions.push(<option key={year} value={year}>{year}</option>);
   }
+
 
   return (
     <div className="container mt-4">
@@ -133,9 +130,9 @@ const Medical = () => {
                           onChange={() => toggleRowSelection(index)}
                         />
                       </td>
-                      <td>{entry[0]}</td>
                       <td>{entry[1]}</td>
                       <td>{entry[2]}</td>
+                      <td>{entry[3]}</td>
                     </tr>
                   ))}
                 </tbody>

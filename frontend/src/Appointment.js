@@ -1,100 +1,143 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Container, Card, Button, Form, Row, Col, Dropdown, DropdownButton } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-// import './appointment.css';
-import axios from 'axios';
+import './CSS/appointment.css';
+import doctorImage from './CSS/assets/doctor.jpg';
 
-import searchDoctorImage from './CSS/assets/logo1.png';
-import bookAppointmentImage from './CSS/assets/pinkpg2.jpg';
-import getWellSoonImage from './CSS/assets/reminders.png';
 
-const Appointment = () => {
-  const [location, setLocation] = useState('');
-  const [department, setDepartment] = useState('');
+function Appointment() {
+  const [doctors, setDoctors] = useState([]);
+  const [search, setSearch] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [resultCount, setResultCount] = useState(0);
+  const [sort, setSort] = useState('experience');
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const handleLocationChange = (e) => {
-    const selectedLocation = e.target.value;
-    setLocation(selectedLocation);
-    console.log('Selected location:', selectedLocation);
-  };
+  useEffect(() => {
+    fetchDoctors();
+  }, [sort]); // Fetch doctors when sort changes
 
-  const handleDepartmentChange = (e) => {
-    const selectedDepartment = e.target.value;
-    setDepartment(selectedDepartment);
-    console.log('Selected department:', selectedDepartment);
+  const fetchDoctors = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/doctors?sort=${sort}`);
+      const data = await response.json();
+      setDoctors(data);
+      setResultCount(data.length);
+    } catch (error) {
+      console.error('Error fetching doctors:', error);
+    }
   };
 
   const handleSearch = async () => {
     try {
-      console.log('Sending search request with:', { location, department });
-      const response = await axios.post('http://localhost:5000/api/search-doctors', { location, department });
-      console.log(response.data);
-      console.log(response.data.length);
-      if (response.data.length > 0) {
-        window.location.href = '/DoctorResults?location=' + location + '&department=' + department;
-        console.log('Doctors found:', response.data);
-      } else {
-        window.location.href = '/DoctorResults?location=' + location + '&department=' + department + '&error=no-doctors-found. Please try again.';
-        //alert('No doctors found for the selected criteria.');
-      }
+      const response = await fetch(`http://localhost:5000/api/doctors?search=${search}&sort=${sort}`);
+      const data = await response.json();
+      setDoctors(data);
+      setResultCount(data.length); // Update result count
+      setShowSuggestions(false); // Hide suggestions after search
     } catch (error) {
-      console.error('Error searching for doctors', error);
+      console.error('Error fetching doctors:', error);
     }
   };
 
+  const handleInputChange = async (e) => {
+    const input = e.target.value;
+    setSearch(input);
+
+    if (input.length > 0) {
+      try {
+        const response = await fetch(`http://localhost:5000/api/departments?search=${input}`);
+        const fetchedSuggestions = await response.json();
+        setSuggestions(fetchedSuggestions);
+        setShowSuggestions(true);
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+      }
+    } else {
+      setSuggestions([]); // Clear suggestions if input is empty
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setSearch(suggestion);
+    setSuggestions([]); // Clear suggestions after a selection
+    setShowSuggestions(false);
+  };
+
   return (
-    <div className="appointment-container">
-      <div className="find-doctor-section">
-        <h2>Find Your Doctor</h2>
-        <div className="search-form">
-          <select 
-            className="form-select"
-            value={location}
-            onChange={handleLocationChange}
-          >
-            <option value="">Select Location</option>
-            <option value="Dhaka">Dhaka</option>
-            <option value="Khulna">Khulna</option>
-            <option value="Chittagong">Chittagong</option>
-            <option value="Sylhet">Sylhet</option>
-            <option value="Mymensingh">Mymensingh</option>
-          </select>
-          <select 
-            className="form-select"
-            value={department}
-            onChange={handleDepartmentChange}
-          >
-            <option value="">Select Department</option>
-            <option value="Cardiology">Cardiology</option>
-            <option value="Neurology">Neurology</option>
-            <option value="Pediatrics">Pediatrics</option>
-            <option value="Orthopedics">Orthopedics</option>
-            <option value="Gynecology">Gynecology</option>
-          </select>
-          <button className="btn btn-primary" onClick={handleSearch}>Search</button>
-        </div>
-      </div>
-      <div className="how-it-works-section">
-        <h2>How it Works</h2>
-        <div className="steps">
-          <div className="step">
-            <img src={searchDoctorImage} alt="Search Doctor" style={{ maxWidth: '250px', height: 'auto' }}/>
-            <h3>Search Doctor</h3>
-            <p>Find your doctor easily with a minimum of effort. We've kept everything organized for you.</p>
-          </div>
-          <div className="step">
-            <img src={bookAppointmentImage} alt="Book Appointment" style={{ maxWidth: '350px', height: 'auto' }}/>
-            <h3>Book Appointment</h3>
-            <p>Ask for an appointment with the doctor quickly with almost a single click. We take care of the rest.</p>
-          </div>
-          <div className="step">
-            <img src={getWellSoonImage} alt="Get Well Soon" style={{ maxWidth: '350px', height: 'auto' }}/>
-            <h3>Get Well Soon</h3>
-            <p>Visit the doctor, take the service based on your appointment. Get back to good health and happiness.</p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Container>
+      <h1 className='text-center mt-4'>Doctors</h1>
+      <Form className="mb-4">
+        <Row>
+          <Col md={8}>
+            {/* Updated search-box structure */}
+            <div className="search-box">
+              <Form.Control
+                type="text"
+                placeholder="Search by department"
+                value={search}
+                onChange={handleInputChange}
+                className="search-input"
+              />
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="suggestions-container">
+                  {suggestions.map((suggestion, index) => (
+                    <p key={index} onClick={() => handleSuggestionClick(suggestion)}>
+                      {suggestion}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Col>
+          <Col md={2}>
+            <Button variant="primary" onClick={handleSearch}>
+              Search
+            </Button>
+          </Col>
+          <Col md={2}>
+            <DropdownButton id="dropdown-basic-button" title="Sort By">
+              <Dropdown.Item onClick={() => setSort('experience')}>Experience</Dropdown.Item>
+              <Dropdown.Item onClick={() => setSort('total_operations')}>Total Operations</Dropdown.Item>
+            </DropdownButton>
+          </Col>
+        </Row>
+      </Form>
+
+      <h4 className='text-center'>Search Result ({resultCount})</h4>
+      <Row>
+        {doctors.map((doctor, index) => (
+          <Col md={6} key={index} className="mb-4">
+            <Card>
+              <Card.Body>
+                <Row>
+                  <Col md={3}>
+                    <img
+                      src={doctorImage}
+                      alt="Doctor"
+                      className="img-fluid rounded-circle"
+                    />
+                  </Col>
+                  <Col md={9}>
+                    <Card.Title>{doctor[1]}</Card.Title>
+                    <Card.Text>
+                      <strong>Department:</strong> {doctor[5]}<br />
+                      <strong>Location:</strong> {doctor[7]}<br />
+                      <strong>Experience:</strong> {doctor[11]} years<br />
+                      <strong>Total Operations:</strong> {doctor[12]}<br />
+                      <strong>Phone Number:</strong> {doctor[4]}<br />
+                    </Card.Text>
+                    <Button variant="primary">Book Appointment</Button>
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </Container>
   );
-};
+}
 
 export default Appointment;

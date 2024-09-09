@@ -39,6 +39,8 @@ CREATE TABLE Doctors (
     mbbsYear VARCHAR2(4) NOT NULL,
     hosp VARCHAR2(255),
     chamber VARCHAR2(255),
+    experience number,
+    total_operations number,
     date_of_birth DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT PK_BMDC PRIMARY KEY (BMDC)
@@ -62,7 +64,7 @@ CREATE TABLE Medical_History (
     year INT,
     incident VARCHAR(255),
     treatment VARCHAR(255),
-    FOREIGN KEY (user_id) REFERENCES User(user_id)
+    FOREIGN KEY (user_id) REFERENCES Users(userid)
 );
 // Medicine Tracker er shob 
 create table medicine (

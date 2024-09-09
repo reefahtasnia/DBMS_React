@@ -818,3 +818,188 @@ app.delete("/medicine/:id", async (req, res) => {
     }
   }
 });
+
+// Endpoint to count total operations for a user
+app.get('/api/medical-history/count-operations', async (req, res) => {
+  let conn;
+  try {
+    conn = await connection();
+    const result = await conn.execute(
+      `SELECT COUNT(*) AS operation_count 
+       FROM Medical_History 
+       WHERE LOWER(treatment) LIKE '%operation%'`
+    );
+    res.json(result.rows[0][0]); // Assuming result.rows[0][0] contains the count
+  } catch (err) {
+    console.error('Error fetching operation count:', err);
+    res.status(500).send('Error fetching operation count');
+  } finally {
+    if (conn) {
+      try {
+        await conn.close();
+      } catch (err) {
+        console.error('Error closing connection:', err);
+      }
+    }
+  }
+});
+// Endpoint to fetch medical history
+app.get('/api/medical-history', async (req, res) => {
+  const { userid } = req.query;
+  let conn;
+  try {
+    conn = await connection();
+    const result = await conn.execute('SELECT * FROM Medical_History WHERE user_id = :userid', [userid]);
+    res.json(result.rows || []);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error fetching data');
+  } finally {
+    if (conn) {
+      try {
+        await conn.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+});
+
+// Endpoint to add medical history
+app.post('/api/medical-history', async (req, res) => {
+  const medicalHistory = req.body;
+  let conn;
+  try {
+    conn = await connection();
+    const insertPromises = medicalHistory.map(entry =>
+      conn.execute(
+        'INSERT INTO Medical_History (user_id,year, incident, treatment) VALUES (:userid,:year, :incident, :treatment)',
+        [entry.userid,entry.year, entry.incident, entry.treatment],
+        { autoCommit: true }
+      )
+    );
+    await Promise.all(insertPromises);
+    res.status(200).send('Data inserted successfully');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error inserting data');
+  } finally {
+    if (conn) {
+      try {
+        await conn.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+});
+app.post('/api/medical-history/delete', async (req, res) => {
+  const { rows } = req.body;
+  let conn;
+
+  try {
+    conn = await connection();
+    console.log('Rows to delete:', rows);
+
+    const deletePromises = rows.map(row => 
+      conn.execute(
+        `DELETE FROM Medical_History
+         WHERE year = :year AND incident = :incident AND treatment = :treatment
+         AND treatment IN (
+           SELECT treatment
+           FROM medical_history
+           WHERE treatment LIKE '%ongoing%'
+           OR treatment LIKE '%upcoming%'
+           OR treatment LIKE '%in progress%'
+           OR treatment LIKE '%under way%'
+           OR treatment LIKE '%proceeding%'
+           OR treatment LIKE '%ing'
+         )`,
+        [row.year, row.incident, row.treatment],
+        { autoCommit: true }
+      )
+    );
+
+    const results = await Promise.all(deletePromises);
+    console.log('Delete results:', results); // Debugging output
+    
+    res.status(200).send('Data deleted successfully');
+  } catch (err) {
+    console.error('Error deleting data', err);
+    res.status(500).send('Error deleting data');
+  } finally {
+    if (conn) {
+      try {
+        await conn.close();
+      } catch (err) {
+        console.error('Error closing connection:', err);
+      }
+    }
+  }
+});
+app.get('/api/doctors', async (req, res) => {
+  const { search, sort } = req.query;
+  let conn;
+
+  try {
+    conn = await connection();
+
+    // Basic query to fetch all doctors, with optional search and sorting
+    let query = 'SELECT * FROM Doctors';
+    let params = [];
+
+    // If search is provided, add WHERE clause to filter by name, department, or location
+    if (search) {
+      query += `
+        WHERE LOWER(dept) LIKE :search 
+        
+      `;
+      params.push(`%${search.toLowerCase()}%`);
+    }
+
+    // Add sorting if provided
+    if (sort) {
+      query += ` ORDER BY ${sort}`;
+    }
+
+    const result = await conn.execute(query, params);
+    res.json(result.rows || []);
+  } catch (err) {
+    console.error('Error fetching doctors:', err);
+    res.status(500).send('Error fetching doctors');
+  } finally {
+    if (conn) {
+      try {
+        await conn.close();
+      } catch (err) {
+        console.error('Error closing connection:', err);
+      }
+    }
+  }
+});
+app.get('/api/departments', async (req, res) => {
+  const { search } = req.query;
+  let conn;
+
+  try {
+    conn = await connection();
+    
+    // Query to fetch departments that match the search term
+    let query = 'SELECT DISTINCT dept FROM Doctors WHERE LOWER(dept) LIKE :search';
+    let params = [`${search.toLowerCase()}%`];
+
+    const result = await conn.execute(query, params);
+    res.json(result.rows.map(row => row[0]));  // Return only the department names
+  } catch (err) {
+    console.error('Error fetching departments:', err);
+    res.status(500).send('Error fetching departments');
+  } finally {
+    if (conn) {
+      try {
+        await conn.close();
+      } catch (err) {
+        console.error('Error closing connection:', err);
+      }
+    }
+  }
+});

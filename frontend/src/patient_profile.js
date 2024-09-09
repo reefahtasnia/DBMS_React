@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import "./CSS/userprofile.css"; // Adjust the path as necessary
 import { FaShoppingCart } from "react-icons/fa"; 
+import { useNavigate } from "react-router-dom";
 
 const UserProfile = () => {
   const auth = JSON.parse(localStorage.getItem("user"));
   const [profileImage, setProfileImage] = useState(
     "https://via.placeholder.com/150"
   );
+  const navigate=useNavigate();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [dob, setDob] = useState("");
@@ -279,14 +281,14 @@ const UserProfile = () => {
         </div>
         <div className="profile-section">
           <h3 className="profile-section-title">Medical History</h3>
-          <button className="profile-section-button">Edit</button>
+          <button className="profile-section-button" onClick={()=>navigate('/medical')}>Edit</button>
           <div className="profile-section-content">
             <p>No known medical conditions.</p>
           </div>
         </div>
         <div className="profile-section">
           <h3 className="profile-section-title">Upcoming Appointments</h3>
-          <button className="profile-section-button">Add</button>
+          <button className="profile-section-button" onClick={()=>navigate('/appointment')}>Add</button>
           <div className="profile-section-content">
             <p>No upcoming appointments.</p>
           </div>
