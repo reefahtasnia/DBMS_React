@@ -9,29 +9,26 @@ const Navbar = () => {
   const navigate = useNavigate();
   const logout = () => {
     alert("Logged out successfully");
-    localStorage.removeItem('user');
-    localStorage.removeItem('userType');
-    localStorage.removeItem('doctor');
-    localStorage.removeItem('userdata');
+    localStorage.removeItem("user");
+    localStorage.removeItem("userType");
+    localStorage.removeItem("doctor");
+    localStorage.removeItem("userdata");
     navigate("/login");
   };
   const handleIconClick = () => {
-    if(auth){
+    if (auth) {
       logout();
-    }
-    else{
+    } else {
       navigate("/login");
     }
   };
-  const handleClick=()=>{ 
-    if(auth){
+  const handleClick = () => {
+    if (auth) {
       navigate("/Patient");
-    }
-    else{
+    } else {
       navigate("/login");
     }
-  }
-
+  };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -59,7 +56,7 @@ const Navbar = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/bookAppointment">
+              <Link className="nav-link" to="/Appointment">
                 Doctors
               </Link>
             </li>
@@ -71,13 +68,9 @@ const Navbar = () => {
           </ul>
           <div className="nav-icon-container" onClick={handleClick}>
             <Link to="/Patient">
-              <img
-                src={userIcon}
-                alt="User Icon"
-                className="nav-user-icon"
-              />
-              </Link>
-            </div>
+              <img src={userIcon} alt="User Icon" className="nav-user-icon" />
+            </Link>
+          </div>
           <button className="btn" type="button" onClick={handleIconClick}>
             {auth ? "Log Out" : "Log In"}
           </button>
